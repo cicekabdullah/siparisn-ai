@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ marka }} — Yönetim Paneli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--turuncu:#FF6B35;--lacivert:#1F2937;--kenar:#E5E7EB;--gri:#6B7280;--zemin:#F9FAFB}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Poppins',system-ui,sans-serif;background:var(--zemin);color:var(--lacivert);padding:26px 16px 60px}
+    .sayfa{max-width:1120px;margin:0 auto}
+
+    /* ================= F-PATTERN =================
+       Goz once ust yatay seridi (baslik/ozet), sonra ikinci yatay seridi
+       (tablo basligi) tarar, ardindan SOL kolonda asagi iner.
+       Bu yuzden en onemli bilgi olan ISIM en solda yer alir. */
+
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.25rem}
+    .logo-ikon{width:34px;height:34px;border-radius:10px;background:var(--turuncu);color:#fff;display:grid;place-items:center}
+    .ust-link{color:var(--gri);text-decoration:none;font-size:.88rem;font-weight:500;border:1px solid var(--kenar);padding:8px 15px;border-radius:999px;background:#fff}
+    .ust-link:hover{border-color:var(--turuncu);color:var(--turuncu)}
+
+    /* F'nin birinci yatay cizgisi: ozet kartlari */
+    .ozet{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+    @media(max-width:700px){.ozet{grid-template-columns:1fr}}
+    .ozet-kart{background:#fff;border:1px solid var(--kenar);border-radius:14px;padding:18px}
+    .ozet-kart small{color:var(--gri);font-size:.78rem;text-transform:uppercase;letter-spacing:.6px}
+    .ozet-kart b{display:block;font-size:1.9rem;margin-top:6px;letter-spacing:-1px}
+    .ozet-kart.vurgu b{color:var(--turuncu)}
+
+    .arac-cubugu{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    #aramaGirisi{flex:1;min-width:220px;font-family:inherit;font-size:.9rem;padding:11px 14px;border:1px solid var(--kenar);border-radius:11px;outline:none;background:#fff}
+    #aramaGirisi:focus{border-color:var(--turuncu)}
+    button{font-family:inherit;font-weight:600;font-size:.9rem;color:#fff;background:var(--turuncu);border:none;border-radius:11px;padding:11px 20px;cursor:pointer}
+    button:hover{filter:brightness(1.08)}
+
+    .tablo-kutu{background:#fff;border:1px solid var(--kenar);border-radius:14px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    /* F'nin ikinci yatay cizgisi: tablo basligi */
+    th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;color:var(--gri);
+       padding:13px 16px;background:var(--zemin);border-bottom:1px solid var(--kenar);white-space:nowrap}
+    td{padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:.9rem;vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#FFF7F3}
+    /* F'nin dikey govdesi: en onemli kolon (isim) solda ve vurgulu */
+    td.isim{font-weight:600}
+    td.telefon{white-space:nowrap}
+    td.mesaj{color:var(--gri);max-width:340px}
+    td.tarih{color:var(--gri);white-space:nowrap;font-size:.83rem}
+    .bos{padding:46px 20px;text-align:center;color:var(--gri)}
+  </style>
+</head>
+<body>
+<div class="sayfa">
+
+  <header>
+    <div class="logo"><div class="logo-ikon">⚡</div><span>{{ marka }} · Yönetim Paneli</span></div>
+    <a class="ust-link" href="/">← Karşılama Sayfası</a>
+  </header>
+
+  <!-- F-PATTERN: birinci yatay tarama seridi -->
+  <div class="ozet">
+    <div class="ozet-kart vurgu"><small>Toplam Kayıt</small><b id="toplamKayit">–</b></div>
+    <div class="ozet-kart"><small>Bugün Gelen</small><b id="bugunGelen">–</b></div>
+    <div class="ozet-kart"><small>Son Kayıt</small><b id="sonKayit" style="font-size:1.05rem;font-weight:500">–</b></div>
+  </div>
+
+  <div class="arac-cubugu">
+    <input id="aramaGirisi" type="text" placeholder="Ad, telefon veya işletme adında ara…">
+    <button id="yenileButonu">Yenile</button>
+  </div>
+
+  <div class="tablo-kutu">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%">Ad Soyad</th>
+          <th style="width:15%">Telefon</th>
+          <th style="width:18%">İşletme</th>
+          <th>Mesaj / Not</th>
+          <th style="width:15%">Tarih</th>
+        </tr>
+      </thead>
+      <tbody id="tabloGovde">
+        <tr><td colspan="5" class="bos">Yükleniyor…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/* Panel, backend'in GET /api/leads ucundan beslenir.
+   Donen anahtarlar backend ile birebir ayni: leadler[].isim / telefon / isletme / mesaj / tarih */
+const API = '';
+let tumLeadler = [];
+
+function tarihBicimle(metin) {
+  const t = new Date(metin.replace(' ', 'T'));
+  if (isNaN(t)) return metin;
+  return t.toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric',
+                                     hour:'2-digit', minute:'2-digit' });
+}
+
+function kacir(metin) {
+  // XSS'e karsi basit koruma: veriyi innerHTML'e gomerken kacir.
+  return String(metin).replace(/[&<>"']/g, k => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]
+  ));
+}
+
+function tabloyuCiz(liste) {
+  const govde = document.getElementById('tabloGovde');
+
+  if (!liste.length) {
+    govde.innerHTML = '<tr><td colspan="5" class="bos">Henüz kayıt yok. ' +
+                      'Karşılama sayfasındaki formdan ilk kaydı oluşturabilirsiniz.</td></tr>';
+    return;
+  }
+
+  // Dongu: her lead icin bir satir uret (en yeniden eskiye backend siraliyor).
+  govde.innerHTML = liste.map(l => `
+    <tr>
+      <td class="isim">${kacir(l.isim)}</td>
+      <td class="telefon">${kacir(l.telefon)}</td>
+      <td>${kacir(l.isletme) || '<span style="color:#9CA3AF">—</span>'}</td>
+      <td class="mesaj">${kacir(l.mesaj) || '—'}</td>
+      <td class="tarih">${tarihBicimle(l.tarih)}</td>
+    </tr>`).join('');
+}
+
+function ozetiGuncelle(liste) {
+  document.getElementById('toplamKayit').textContent = liste.length;
+
+  const bugun = new Date().toDateString();
+  const bugunkuler = liste.filter(l => {
+    const t = new Date(l.tarih.replace(' ', 'T'));
+    return !isNaN(t) && t.toDateString() === bugun;
+  });
+  document.getElementById('bugunGelen').textContent = bugunkuler.length;
+  document.getElementById('sonKayit').textContent =
+    liste.length ? tarihBicimle(liste[0].tarih) : '–';
+}
+
+async function leadleriGetir() {
+  try {
+    const yanit = await fetch(API + '/api/leads');
+    const veri  = await yanit.json();
+
+    if (veri.basari) {
+      tumLeadler = veri.leadler;
+      tabloyuCiz(tumLeadler);
+      ozetiGuncelle(tumLeadler);
+    } else {
+      document.getElementById('tabloGovde').innerHTML =
+        '<tr><td colspan="5" class="bos">' + kacir(veri.hata || 'Kayıtlar getirilemedi.') + '</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('tabloGovde').innerHTML =
+      '<tr><td colspan="5" class="bos">Sunucuya ulaşılamadı.</td></tr>';
+  }
+}
+
+document.getElementById('yenileButonu').addEventListener('click', leadleriGetir);
+document.getElementById('aramaGirisi').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  tabloyuCiz(tumLeadler.filter(l =>
+    (l.isim + ' ' + l.telefon + ' ' + l.isletme).toLowerCase().includes(q)
+  ));
+});
+
+leadleriGetir();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# Render Blueprint - istege bagli kolaylik dosyasi.
+# Render panelinden elle de olusturabilirsiniz (README, Bolum 8).
+services:
+  - type: web
+    name: siparisn-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true   # Render rastgele uretir
+      - key: GROQ_API_KEY
+        sync: false           # Panelden elle girilir, depoya yazilmaz
+      - key: CORS_ORIGINS
+        sync: false           # Wix alan adiniz

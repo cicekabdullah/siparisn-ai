@@ -1,0 +1,21 @@
+# Gizli anahtarlar - ASLA git'e girmemeli
+.env
+
+# Sanal ortam
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Veritabani dosyasi (yerelde uretilir)
+*.db
+*.sqlite3
+instance/
+
+# Isletim sistemi / editor
+.DS_Store
+.vscode/
+.idea/

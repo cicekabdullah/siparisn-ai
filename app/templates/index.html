@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ marka }} — Tüm siparişleriniz tek ekranda</title>
+  <!-- Marka tipografisi: Poppins (Proje Başlatma Formu, Bölüm III) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---- Marka renkleri tek yerde tanimlanir ---- */
+    :root{
+      --turuncu:#FF6B35;      /* Birincil: hiz, enerji, yemek sektoru */
+      --lacivert:#1F2937;     /* Ikincil: guven, teknoloji */
+      --lacivert-acik:#374151;
+      --beyaz:#ffffff;
+      --gri:#9CA3AF;
+      --radius:18px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Poppins',system-ui,sans-serif;
+      color:var(--beyaz);
+      min-height:100vh;
+      background:
+        radial-gradient(900px 500px at 85% -5%, rgba(255,107,53,.35), transparent 60%),
+        radial-gradient(700px 500px at 0% 100%, rgba(255,107,53,.18), transparent 55%),
+        var(--lacivert);
+      padding:28px 16px 60px;
+    }
+    .sayfa{max-width:1120px;margin:0 auto}
+
+    /* ================= Z-PATTERN =================
+       Goz sol ustten (logo) -> sag uste (sohbet karti) ->
+       sol alta (deger onerileri) -> sag alta (form) gider.
+       Yerlesim bilincli olarak bu sirayi izler. */
+
+    /* 1. durak: sol ust - logo */
+    .ust{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:34px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.35rem;letter-spacing:-.3px}
+    .logo-ikon{
+      width:38px;height:38px;border-radius:11px;background:var(--turuncu);
+      display:grid;place-items:center;font-size:1.1rem;
+      box-shadow:0 8px 20px rgba(255,107,53,.4);
+    }
+    .ust-link{color:var(--gri);text-decoration:none;font-size:.9rem;font-weight:500;
+      border:1px solid rgba(255,255,255,.18);padding:9px 16px;border-radius:999px}
+    .ust-link:hover{color:var(--beyaz);border-color:var(--turuncu)}
+
+    .izgara{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+    @media(max-width:880px){.izgara{grid-template-columns:1fr}}
+
+    /* Glassmorphism (buzlu cam) karti - yonergenin istedigi efekt */
+    .cam{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-radius:var(--radius);
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      padding:26px;
+    }
+
+    h1{font-size:2.45rem;line-height:1.15;font-weight:700;letter-spacing:-1px;margin-bottom:14px}
+    h1 span{color:var(--turuncu)}
+    .slogan{color:#D1D5DB;font-size:1.02rem;line-height:1.65;margin-bottom:24px}
+
+    /* 3. durak: sol alt - sektor kartlari / deger onerisi */
+    .kartlar{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .kart{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      border-radius:13px;padding:14px}
+    .kart b{display:block;font-size:.93rem;margin-bottom:4px}
+    .kart small{color:var(--gri);font-size:.79rem;line-height:1.5}
+
+    /* 2. durak: sag ust - AI sohbet karti */
+    .baslik{display:flex;align-items:center;gap:9px;font-weight:600;margin-bottom:14px}
+    .nokta{width:9px;height:9px;border-radius:50%;background:#34D399;box-shadow:0 0 0 4px rgba(52,211,153,.2)}
+
+    #sohbetAlani{
+      min-height:190px;max-height:290px;overflow-y:auto;
+      background:rgba(0,0,0,.22);border-radius:13px;padding:14px;
+      display:flex;flex-direction:column;gap:10px;margin-bottom:14px;
+    }
+    .balon{padding:10px 14px;border-radius:13px;font-size:.9rem;line-height:1.55;max-width:88%;white-space:pre-wrap}
+    .bot{background:rgba(255,255,255,.1);align-self:flex-start;border-bottom-left-radius:4px}
+    .ben{background:var(--turuncu);align-self:flex-end;border-bottom-right-radius:4px;font-weight:500}
+    .hata{background:rgba(239,68,68,.22);border:1px solid rgba(239,68,68,.45);align-self:flex-start}
+
+    .satir{display:flex;gap:9px}
+    input,textarea{
+      width:100%;font-family:inherit;font-size:.93rem;color:var(--beyaz);
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+      border-radius:11px;padding:12px 14px;outline:none;
+    }
+    input::placeholder,textarea::placeholder{color:#8b93a1}
+    input:focus,textarea:focus{border-color:var(--turuncu);background:rgba(255,255,255,.12)}
+
+    button{
+      font-family:inherit;font-weight:600;font-size:.93rem;color:var(--beyaz);
+      background:var(--turuncu);border:none;border-radius:11px;padding:12px 22px;
+      cursor:pointer;white-space:nowrap;transition:.18s;
+    }
+    button:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+
+    /* 4. durak: sag alt - gozun indigi yerde iletisim formu */
+    .form-alani{margin-top:26px}
+    .form-alani h2{font-size:1.15rem;margin-bottom:6px}
+    .form-alani p{color:var(--gri);font-size:.86rem;margin-bottom:16px}
+    .form-izgara{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+    @media(max-width:560px){.form-izgara,.kartlar{grid-template-columns:1fr}}
+    #formDurum{margin-top:12px;font-size:.88rem;min-height:20px}
+    .basarili{color:#34D399}
+    .basarisiz{color:#F87171}
+    .kvkk{color:#6B7280;font-size:.74rem;margin-top:12px;line-height:1.5}
+    .kvkk a{color:var(--gri)}
+  </style>
+</head>
+<body>
+<div class="sayfa">
+
+  <!-- Z-PATTERN 1: sol ust -->
+  <header class="ust">
+    <div class="logo">
+      <div class="logo-ikon">⚡</div>
+      <span>{{ marka }}</span>
+    </div>
+    <a class="ust-link" href="/dashboard">Yönetim Paneli →</a>
+  </header>
+
+  <div class="izgara">
+    <!-- SOL SUTUN: baslik + Z-PATTERN 3 (sol alt) -->
+    <section>
+      <h1>Tüm siparişleriniz<br><span>tek ekranda.</span></h1>
+      <p class="slogan">
+        Trendyol Yemek, Getir Yemek ve diğer platformlardan gelen siparişleri
+        ayrı ayrı takip etmeyin. {{ marka }} hepsini tek merkezde toplar;
+        ekibiniz uygulamalar arasında gezinmez, sipariş kaçmaz.
+      </p>
+      <div class="kartlar">
+        <div class="kart"><b>🍽️ Restoran &amp; Kafe</b><small>Yoğun saatte tek ekrandan akış kontrolü.</small></div>
+        <div class="kart"><b>🍔 Fast-food</b><small>Hızlı sipariş döngüsü, azalan hata payı.</small></div>
+        <div class="kart"><b>🛵 Paket servis</b><small>Teslimat durumlarını merkezden izleme.</small></div>
+        <div class="kart"><b>🏪 Küçük zincirler</b><small>Şubeler arası tek tip operasyon.</small></div>
+      </div>
+    </section>
+
+    <!-- SAG SUTUN: Z-PATTERN 2 (sag ust) sohbet + Z-PATTERN 4 (sag alt) form -->
+    <section>
+      <div class="cam">
+        <div class="baslik"><span class="nokta"></span> {{ marka }} Akıllı Satış Asistanı</div>
+
+        <div id="sohbetAlani">
+          <div class="balon bot">Merhaba! Ben {{ marka }} asistanıyım. Merkezi sipariş yönetimi, platform entegrasyonları ve kurulum süreci hakkında sorularınızı yanıtlayabilirim. Ne öğrenmek istersiniz?</div>
+        </div>
+
+        <div class="satir">
+          <input id="mesajGirisi" type="text" placeholder="Sorunuzu yazın… (örn. Getir Yemek entegrasyonu var mı?)" autocomplete="off">
+          <button id="sorButonu">Sor</button>
+        </div>
+
+        <!-- Z-PATTERN 4: gozun indigi son nokta -> donusum (lead formu) -->
+        <div class="form-alani">
+          <h2>Ücretsiz demo talep edin</h2>
+          <p>Bilgilerinizi bırakın, işletmenize özel kurulumu birlikte planlayalım.</p>
+          <div class="form-izgara">
+            <input id="isimGirisi" type="text" placeholder="Ad Soyad *">
+            <input id="telefonGirisi" type="tel" placeholder="Telefon *">
+          </div>
+          <div class="form-izgara">
+            <input id="isletmeGirisi" type="text" placeholder="İşletme adı">
+            <input id="notGirisi" type="text" placeholder="Kaç platformdan sipariş alıyorsunuz?">
+          </div>
+          <button id="kaydetButonu" style="width:100%">Kaydet</button>
+          <div id="formDurum"></div>
+          <p class="kvkk">
+            Formu göndererek ad, telefon ve işletme bilgilerinizin demo süreci kapsamında
+            işlenmesine izin vermiş olursunuz. Detaylar için {{ marka }} KVKK Politikası.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   FRONTEND -> BACKEND BAGLANTISI
+   KRITIK: alan adlari backend ile BIREBIR ayni olmali.
+     sohbet  -> gonder: mesaj   / al: cevap
+     kayit   -> gonder: isim, telefon, isletme, mesaj
+   Bir harf farki baglantiyi koparir.
+   ========================================================= */
+const API = '';   // ayni sunucudan servis edildigi icin bos; Wix'te Render adresi yazilir
+
+const sohbetAlani  = document.getElementById('sohbetAlani');
+const mesajGirisi  = document.getElementById('mesajGirisi');
+const sorButonu    = document.getElementById('sorButonu');
+const kaydetButonu = document.getElementById('kaydetButonu');
+const formDurum    = document.getElementById('formDurum');
+
+// Konusma gecmisi: backend'e gonderilir ki asistan baglami hatirlasin.
+let gecmis = [];
+
+function balonEkle(metin, sinif) {
+  const div = document.createElement('div');
+  div.className = 'balon ' + sinif;
+  div.textContent = metin;
+  sohbetAlani.appendChild(div);
+  sohbetAlani.scrollTop = sohbetAlani.scrollHeight;
+  return div;
+}
+
+async function soruSor() {
+  const mesaj = mesajGirisi.value.trim();
+  if (!mesaj) return;
+
+  balonEkle(mesaj, 'ben');
+  mesajGirisi.value = '';
+  sorButonu.disabled = true;
+  const bekleyen = balonEkle('yazıyor…', 'bot');
+
+  try {
+    const yanit = await fetch(API + '/api/sohbet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mesaj: mesaj, gecmis: gecmis })
+    });
+    const veri = await yanit.json();
+
+    if (veri.basari) {
+      bekleyen.textContent = veri.cevap;
+      // Gecmisi guncelle (son 10 mesajla sinirli tut - istek boyutu buyumesin)
+      gecmis.push({ role: 'user', content: mesaj });
+      gecmis.push({ role: 'assistant', content: veri.cevap });
+      gecmis = gecmis.slice(-10);
+    } else {
+      bekleyen.className = 'balon hata';
+      bekleyen.textContent = veri.hata || 'Yanıt alınamadı.';
+    }
+  } catch (e) {
+    bekleyen.className = 'balon hata';
+    bekleyen.textContent = 'Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.';
+  } finally {
+    sorButonu.disabled = false;
+    mesajGirisi.focus();
+  }
+}
+
+async function leadKaydet() {
+  const isim    = document.getElementById('isimGirisi').value.trim();
+  const telefon = document.getElementById('telefonGirisi').value.trim();
+  const isletme = document.getElementById('isletmeGirisi').value.trim();
+  const not     = document.getElementById('notGirisi').value.trim();
+
+  // Istemci tarafi on kontrol; backend zaten tekrar dogruluyor.
+  if (!isim || !telefon) {
+    formDurum.className = 'basarisiz';
+    formDurum.textContent = 'Ad ve telefon alanları zorunludur.';
+    return;
+  }
+
+  kaydetButonu.disabled = true;
+  formDurum.className = '';
+  formDurum.textContent = 'Kaydediliyor…';
+
+  try {
+    const yanit = await fetch(API + '/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isim: isim, telefon: telefon, isletme: isletme, mesaj: not })
+    });
+    const veri = await yanit.json();
+
+    if (veri.basari) {
+      formDurum.className = 'basarili';
+      formDurum.textContent = '✓ ' + veri.mesaj;
+      ['isimGirisi','telefonGirisi','isletmeGirisi','notGirisi']
+        .forEach(id => document.getElementById(id).value = '');
+    } else {
+      formDurum.className = 'basarisiz';
+      formDurum.textContent = veri.hata || 'Kayıt oluşturulamadı.';
+    }
+  } catch (e) {
+    formDurum.className = 'basarisiz';
+    formDurum.textContent = 'Sunucuya ulaşılamadı.';
+  } finally {
+    kaydetButonu.disabled = false;
+  }
+}
+
+sorButonu.addEventListener('click', soruSor);
+mesajGirisi.addEventListener('keydown', e => { if (e.key === 'Enter') soruSor(); });
+kaydetButonu.addEventListener('click', leadKaydet);
+</script>
+</body>
+</html>
