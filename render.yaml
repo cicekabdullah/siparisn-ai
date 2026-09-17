@@ -1,17 +1,23 @@
-# Render Blueprint - istege bagli kolaylik dosyasi.
-# Render panelinden elle de olusturabilirsiniz (README, Bolum 8).
+# Render Blueprint
+# Render > New > Blueprint > bu depoyu sec -> tum ayarlari buradan okur.
+# Forma elle bir sey girmene gerek kalmaz; sadece GROQ_API_KEY sorulur.
 services:
   - type: web
     name: siparisn-api
     runtime: python
+    plan: free                # ucretsiz plan - acikca belirtilmezse ucretli plana dusebilir
+    region: frankfurt         # Turkiye'ye en yakin bolge -> dusuk gecikme
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn run:app
+    healthCheckPath: /health  # Render canliligi bu uctan kontrol eder
     envVars:
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
-        generateValue: true   # Render rastgele uretir
+        generateValue: true   # Render rastgele uretir, sen ugrasmazsin
+      - key: PYTHON_VERSION
+        value: "3.11.9"
       - key: GROQ_API_KEY
-        sync: false           # Panelden elle girilir, depoya yazilmaz
+        sync: false           # deploy sirasinda Render sana sorar, depoya yazilmaz
       - key: CORS_ORIGINS
-        sync: false           # Wix alan adiniz
+        value: "*"            # Wix alan adin belli olunca daraltacagiz
