@@ -19,3 +19,6 @@ instance/
 .DS_Store
 .vscode/
 .idea/
+
+# Wix CLI hata gunlugu (bu proje Flask backend deposu, Wix sitesi ayri depoda)
+.wix/
