@@ -45,7 +45,21 @@ kontrol "POST /api/sohbet (bos mesaj)" 400 "$(kod -X POST $B/api/sohbet -H 'Cont
 echo "6) Guvenlik: SQL Injection denemesi"
 enjeksiyon=$(kod -X POST $B/api/leads -H 'Content-Type: application/json' \
   -d "{\"isim\":\"x'); DROP TABLE leads; --\",\"telefon\":\"05000000000\"}")
-kontrol "zararli girdi duz metin olarak kaydedildi" 201 "$enjeksiyon"
+# Iki sonuc da BASARILIDIR ve ikisi de savunmanin calistigini gosterir:
+#   201 -> istek uygulamaya ulasti; parametreli sorgu sayesinde zararli metin
+#          SQL olarak degil, duz veri olarak kaydedildi (bizim korumamiz).
+#   403 -> istek uygulamaya hic ulasmadi; Render onundeki Cloudflare guvenlik
+#          duvari engelledi (altyapi korumasi). Yayinda beklenen davranis budur.
+if [ "$enjeksiyon" = "201" ]; then
+  echo "  ✓ zararli girdi duz metin olarak kaydedildi — parametreli sorgu korudu (201)"
+  gecti=$((gecti+1))
+elif [ "$enjeksiyon" = "403" ]; then
+  echo "  ✓ zararli istek uygulamaya ulasmadan engellendi — Cloudflare WAF (403)"
+  gecti=$((gecti+1))
+else
+  echo "  ✗ SQL Injection korumasi — beklenen 201 veya 403, alinan $enjeksiyon"
+  kaldi=$((kaldi+1))
+fi
 kontrol "tablo hala ayakta (GET /api/leads)" 200 "$(kod $B/api/leads)"
 
 echo "7) Hata yonetimi"

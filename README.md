@@ -3,6 +3,14 @@
 > SmartLead AI Öğrenci Proje Yönergesi'nin **SiparişN** markasına uyarlanmış uygulaması.
 > Mimari yönergeyle birebir aynıdır; değişen tek şey konudur.
 
+| | |
+|---|---|
+| 🌐 Canlı backend | **https://siparisn-ai.onrender.com** |
+| 💬 Karşılama sayfası | https://siparisn-ai.onrender.com/ |
+| 📊 Yönetim paneli | https://siparisn-ai.onrender.com/dashboard |
+| ❤️ Canlılık kontrolü | https://siparisn-ai.onrender.com/health |
+| 📦 Kaynak kod | https://github.com/cicekabdullah/siparisn-ai |
+
 **Marka yöneticisi:** Abdullah ÇİÇEK · **Sektör:** Gıda / Restoran Teknolojileri ve Yazılım
 
 SiparişN, restoranların Trendyol Yemek, Getir Yemek ve benzeri farklı sipariş
@@ -186,12 +194,22 @@ Mimariyi bozmaz; form ve panel de buna göre güncellenmiştir.
 ## 7. Test
 
 ```bash
-./test_api.sh                      # yerel sunucuya karşı
-./test_api.sh https://<render-adresiniz>   # canlı ortama karşı
+./test_api.sh                                    # yerel sunucuya karşı
+./test_api.sh https://siparisn-ai.onrender.com   # canlı ortama karşı
 ```
 
 13 kontrol çalışır: canlılık, iki sayfa, lead ekleme/doğrulama/listeleme,
-sohbet, SQL Injection denemesi ve hata kodları.
+sohbet, SQL Injection denemesi ve hata kodları. **Canlı ortamda 13/13 geçer.**
+
+### SQL Injection testinin iki geçerli sonucu
+
+| Kod | Anlamı |
+|---|---|
+| `201` | İstek uygulamaya ulaştı; parametreli sorgu sayesinde zararlı metin SQL olarak değil düz veri olarak kaydedildi — **uygulamanın kendi koruması**. Yerelde bu sonuç alınır. |
+| `403` | İstek uygulamaya hiç ulaşmadı; Render'ın önündeki Cloudflare güvenlik duvarı engelledi — **altyapı koruması**. Canlıda bu sonuç alınır. |
+
+İkisi de başarıdır ve birlikte katmanlı savunmayı gösterir: uygulama kendini
+tek başına da koruyabiliyor, yayında ise önünde ikinci bir katman daha var.
 
 ---
 
