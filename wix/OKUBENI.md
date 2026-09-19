@@ -1,5 +1,9 @@
 # Wix Studio ↔ SiparişN Backend — Çalışma Düzeni
 
+> **Önce bunu oku:** Sohbet sekmesinin Studio'da nasıl tasarlanacağı
+> **[CHATBOT-TASARIM.md](CHATBOT-TASARIM.md)** dosyasındadır. Bu dosya
+> API sözleşmesini ve genel çalışma düzenini anlatır.
+
 ## Sıralama kritik
 
 Wix siteleri **HTTPS**'tir ve `http://localhost:5001` adresine istek **atamaz**.
@@ -109,7 +113,14 @@ Hata olursa bakılacak yer sırası: Render logları → Wix backend log'u
 
 ---
 
-# Git Entegrasyonu + Wix CLI ile Çalışma (seçilen yol)
+# Git Entegrasyonu + Wix CLI ile Çalışma
+
+> **BU YOL KULLANILMIYOR.** Eğitmen, kodun Wix uygulamasının içinden
+> yönetilmesini ve tasarımın Studio üzerinde yapılmasını istedi. Site GitHub'a
+> **bağlanmayacak**; kod doğrudan Studio'nun Code panelinde yaşayacak.
+> Aşağıdaki bölüm yalnızca kayıt olsun diye duruyor.
+>
+> Güncel yol: **[CHATBOT-TASARIM.md](CHATBOT-TASARIM.md)**
 
 ## Neden bu sıra?
 

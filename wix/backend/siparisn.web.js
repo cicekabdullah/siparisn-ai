@@ -24,7 +24,7 @@ import { fetch } from 'wix-fetch';
    İsterseniz bu adresi Wix Secrets Manager'da da tutabilirsiniz
    (import { getSecret } from 'wix-secrets-backend'). Adres gizli bir bilgi
    olmadığı için sabit tutmak da kabul edilebilir. */
-const API_ADRESI = 'https://SIZIN-RENDER-ADRESINIZ.onrender.com';
+const API_ADRESI = 'https://siparisn-ai.onrender.com';
 
 /* ---------- 1) AI SOHBETİ -> POST /api/sohbet ----------
    Permissions.Anyone: siteyi ziyaret eden herkes çağırabilir.
