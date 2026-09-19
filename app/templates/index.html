@@ -3,167 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ marka }} — Tüm siparişleriniz tek ekranda</title>
-  <!-- Marka tipografisi: Poppins (Proje Başlatma Formu, Bölüm III) -->
+  <title>{{ marka }} — Tüm siparişler, tek ekranda.</title>
+
+  <!-- Favicon: Kurumsal Kimlik Kılavuzu s.15 — 16 px'te şimşek ile "N" birbirine
+       karıştığı için bu boyutta şimşeksiz sade bir "N" kullanılır. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='6.4' fill='%23FF6B35'/%3E%3Ctext x='50' y='73' font-family='Poppins,Arial,sans-serif' font-size='68' font-weight='700' fill='%23FFFFFF' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+
+  <!-- Kılavuz s.17-18: Poppins ana (başlık, buton, marka), Inter yardımcı (gövde, arayüz) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
-    /* ---- Marka renkleri tek yerde tanimlanir ---- */
+    /* =====================================================================
+       SiparişN — Kurumsal Kimlik Kılavuzu Sürüm 1.0 (Eylül 2026) uyarlaması
+       Bu dosyadaki her renk ve ölçü kılavuzdaki bir kurala dayanır.
+       ===================================================================== */
     :root{
-      --turuncu:#FF6B35;      /* Birincil: hiz, enerji, yemek sektoru */
-      --lacivert:#1F2937;     /* Ikincil: guven, teknoloji */
-      --lacivert-acik:#374151;
-      --beyaz:#ffffff;
-      --gri:#9CA3AF;
-      --radius:18px;
+      /* --- Ana palet (Kılavuz s.6) --- */
+      --turuncu:#FF6B35;        /* Hız, enerji. Logo rozeti ve vurgular. */
+      --sari:#FFDE32;           /* Şimşek Sarısı. SADECE logoda ve koyu zeminde. */
+      --lacivert:#1F2937;       /* Gece Lacivert. Metin ve koyu zeminler. */
+
+      /* --- Destek renkleri (Kılavuz s.7) --- */
+      --turuncu-koyu:#C2410C;   /* Beyaz metinli buton/link zemini (5,2:1) */
+      --basarili:#16A34A;
+      --hata:#DC2626;
+      --ayrac:#E5E7EB;
+
+      /* --- Koyu zeminde metin renkleri (Kılavuz s.21) --- */
+      --koyu-baslik:#FFFFFF;
+      --koyu-govde:#E5E7EB;     /* Saf beyaz gövde göz yorar, kullanılmaz */
+      --koyu-ikincil:#9CA3AF;
+      --koyu-vurgu:#FF8A5B;     /* Koyu zeminde ana turuncu yerine açık ton */
+
+      /* --- Tramlar (Kılavuz s.8: %20 ve katları, ara değer yok) --- */
+      --lacivert-80:#4C545F;
+
+      --r:8px;                  /* Kılavuz s.26: buton ve kartlarda 8 px */
     }
+
     *{box-sizing:border-box;margin:0;padding:0}
+
     body{
-      font-family:'Poppins',system-ui,sans-serif;
-      color:var(--beyaz);
+      /* Gövde metni Inter (Kılavuz s.18) */
+      font-family:'Inter',system-ui,sans-serif;
+      font-size:16px; line-height:1.6;          /* Gövde: 10,5 pt / 1,6 */
+      color:var(--koyu-govde);
+      background:var(--lacivert);
       min-height:100vh;
-      background:
-        radial-gradient(900px 500px at 85% -5%, rgba(255,107,53,.35), transparent 60%),
-        radial-gradient(700px 500px at 0% 100%, rgba(255,107,53,.18), transparent 55%),
-        var(--lacivert);
       padding:28px 16px 60px;
+      -webkit-font-smoothing:antialiased;
+    }
+    /* Koyu zeminde %20 tramlı turuncu filigran — grafik öğe, metin değil */
+    body::before{
+      content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background:
+        radial-gradient(760px 460px at 88% -8%, rgba(255,107,53,.22), transparent 62%),
+        radial-gradient(620px 460px at -6% 104%, rgba(255,107,53,.12), transparent 58%);
     }
     .sayfa{max-width:1120px;margin:0 auto}
 
+    /* Başlıklar Poppins (Kılavuz s.19 hiyerarşi tablosu) */
+    h1,h2,h3,.marka,button{font-family:'Poppins',system-ui,sans-serif}
+    h1{font-size:44px;line-height:1.15;font-weight:600;letter-spacing:-.8px;color:var(--koyu-baslik)}
+    h2{font-size:22px;line-height:1.25;font-weight:600;color:var(--koyu-baslik)}
+    h3{font-size:16px;line-height:1.35;font-weight:500;color:var(--koyu-baslik)}
+
     /* ================= Z-PATTERN =================
-       Goz sol ustten (logo) -> sag uste (sohbet karti) ->
-       sol alta (deger onerileri) -> sag alta (form) gider.
-       Yerlesim bilincli olarak bu sirayi izler. */
+       Göz sol üstten (logo) → sağ üste (sohbet kartı) →
+       sol alta (sektör kartları) → sağ alta (form) iner. */
 
-    /* 1. durak: sol ust - logo */
-    .ust{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:34px}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.35rem;letter-spacing:-.3px}
-    .logo-ikon{
-      width:38px;height:38px;border-radius:11px;background:var(--turuncu);
-      display:grid;place-items:center;font-size:1.1rem;
-      box-shadow:0 8px 20px rgba(255,107,53,.4);
+    /* 1 · sol üst — logo */
+    .ust{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:36px}
+    .logo{display:flex;align-items:center;gap:11px}
+    /* Kılavuz s.11: koyu zeminde rozet aynen korunur, kelime markası beyaza döner */
+    .rozet{width:40px;height:40px;flex-shrink:0;display:block}
+    .marka{font-size:21px;font-weight:600;letter-spacing:-.3px;color:var(--koyu-baslik)}
+    .ust-link{
+      font-family:'Poppins',sans-serif;font-size:15px;font-weight:500;letter-spacing:.02em;
+      color:var(--koyu-govde);text-decoration:none;
+      border:1px solid rgba(255,255,255,.22);padding:9px 17px;border-radius:999px;
     }
-    .ust-link{color:var(--gri);text-decoration:none;font-size:.9rem;font-weight:500;
-      border:1px solid rgba(255,255,255,.18);padding:9px 16px;border-radius:999px}
-    .ust-link:hover{color:var(--beyaz);border-color:var(--turuncu)}
+    .ust-link:hover{border-color:var(--koyu-vurgu);color:var(--koyu-vurgu)}
 
-    .izgara{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+    .izgara{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
     @media(max-width:880px){.izgara{grid-template-columns:1fr}}
 
-    /* Glassmorphism (buzlu cam) karti - yonergenin istedigi efekt */
+    /* Glassmorphism (yönerge Modül G) — kılavuzun 8 px köşe kuralıyla birlikte */
     .cam{
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.16);
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      border-radius:var(--radius);
-      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      border-radius:var(--r);
+      box-shadow:0 18px 50px rgba(0,0,0,.34);
       padding:26px;
     }
 
-    h1{font-size:2.45rem;line-height:1.15;font-weight:700;letter-spacing:-1px;margin-bottom:14px}
-    h1 span{color:var(--turuncu)}
-    .slogan{color:#D1D5DB;font-size:1.02rem;line-height:1.65;margin-bottom:24px}
+    /* Marka vaadi — kılavuz kapak ve s.19: "Tüm siparişler, tek ekranda." */
+    h1 em{font-style:normal;color:var(--koyu-vurgu)}
+    .slogan{max-width:62ch;margin:14px 0 26px}  /* s.20: satır 60-75 karakter */
 
-    /* 3. durak: sol alt - sektor kartlari / deger onerisi */
+    /* 3 · sol alt — sektör kartları */
     .kartlar{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .kart{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-      border-radius:13px;padding:14px}
-    .kart b{display:block;font-size:.93rem;margin-bottom:4px}
-    .kart small{color:var(--gri);font-size:.79rem;line-height:1.5}
+    .kart{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);
+      border-radius:var(--r);padding:15px 16px}
+    .kart h3{margin-bottom:3px}
+    .kart p{font-size:13px;line-height:1.5;color:var(--koyu-ikincil)}
 
-    /* 2. durak: sag ust - AI sohbet karti */
-    .baslik{display:flex;align-items:center;gap:9px;font-weight:600;margin-bottom:14px}
-    .nokta{width:9px;height:9px;border-radius:50%;background:#34D399;box-shadow:0 0 0 4px rgba(52,211,153,.2)}
+    /* 2 · sağ üst — AI sohbet kartı */
+    .kart-baslik{display:flex;align-items:center;gap:9px;margin-bottom:15px}
+    /* Sarı yalnızca koyu zeminde vurgu olarak kullanılabilir (Kılavuz s.7 — 11,0:1) */
+    .nokta{width:8px;height:8px;border-radius:50%;background:var(--sari);
+      box-shadow:0 0 0 4px rgba(255,222,50,.16)}
 
     #sohbetAlani{
-      min-height:190px;max-height:290px;overflow-y:auto;
-      background:rgba(0,0,0,.22);border-radius:13px;padding:14px;
+      min-height:186px;max-height:280px;overflow-y:auto;
+      background:rgba(0,0,0,.24);border-radius:var(--r);padding:14px;
       display:flex;flex-direction:column;gap:10px;margin-bottom:14px;
     }
-    .balon{padding:10px 14px;border-radius:13px;font-size:.9rem;line-height:1.55;max-width:88%;white-space:pre-wrap}
-    .bot{background:rgba(255,255,255,.1);align-self:flex-start;border-bottom-left-radius:4px}
-    .ben{background:var(--turuncu);align-self:flex-end;border-bottom-right-radius:4px;font-weight:500}
-    .hata{background:rgba(239,68,68,.22);border:1px solid rgba(239,68,68,.45);align-self:flex-start}
+    .balon{padding:10px 14px;border-radius:var(--r);font-size:15px;line-height:1.55;max-width:88%;white-space:pre-wrap}
+    .bot{background:rgba(255,255,255,.09);align-self:flex-start}
+    /* Beyaz metinli turuncu kabarcık: zemin #C2410C (Kılavuz s.7 — 5,2:1) */
+    .ben{background:var(--turuncu-koyu);color:#fff;align-self:flex-end;font-weight:500}
+    .balon-hata{background:rgba(220,38,38,.18);border:1px solid rgba(220,38,38,.42);align-self:flex-start}
 
     .satir{display:flex;gap:9px}
-    input,textarea{
-      width:100%;font-family:inherit;font-size:.93rem;color:var(--beyaz);
-      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
-      border-radius:11px;padding:12px 14px;outline:none;
+    input{
+      width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--koyu-baslik);
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);
+      border-radius:var(--r);padding:12px 14px;outline:none;
     }
-    input::placeholder,textarea::placeholder{color:#8b93a1}
-    input:focus,textarea:focus{border-color:var(--turuncu);background:rgba(255,255,255,.12)}
+    input::placeholder{color:var(--koyu-ikincil)}
+    input:focus{border-color:var(--koyu-vurgu);background:rgba(255,255,255,.11)}
 
+    /* Buton / Etiket: Poppins Medium, harf aralığı +0,2 (Kılavuz s.19)
+       Beyaz metinli buton zemini daima #C2410C (Kılavuz s.21 — bağlayıcı kural) */
     button{
-      font-family:inherit;font-weight:600;font-size:.93rem;color:var(--beyaz);
-      background:var(--turuncu);border:none;border-radius:11px;padding:12px 22px;
-      cursor:pointer;white-space:nowrap;transition:.18s;
+      font-family:'Poppins',sans-serif;font-size:15px;font-weight:500;letter-spacing:.02em;
+      color:#fff;background:var(--turuncu-koyu);border:none;border-radius:var(--r);
+      padding:12px 22px;cursor:pointer;white-space:nowrap;transition:filter .18s;
     }
-    button:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
-    button:disabled{opacity:.55;cursor:not-allowed}
+    button:hover:not(:disabled){filter:brightness(1.12)}
+    button:disabled{opacity:.5;cursor:not-allowed}
 
-    /* 4. durak: sag alt - gozun indigi yerde iletisim formu */
-    .form-alani{margin-top:26px}
-    .form-alani h2{font-size:1.15rem;margin-bottom:6px}
-    .form-alani p{color:var(--gri);font-size:.86rem;margin-bottom:16px}
+    /* 4 · sağ alt — gözün indiği yerde dönüşüm */
+    .form-alani{margin-top:26px;padding-top:24px;border-top:1px solid rgba(255,255,255,.12)}
+    .form-alani p.aciklama{font-size:14px;color:var(--koyu-ikincil);margin:5px 0 16px}
     .form-izgara{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
     @media(max-width:560px){.form-izgara,.kartlar{grid-template-columns:1fr}}
-    #formDurum{margin-top:12px;font-size:.88rem;min-height:20px}
-    .basarili{color:#34D399}
-    .basarisiz{color:#F87171}
-    .kvkk{color:#6B7280;font-size:.74rem;margin-top:12px;line-height:1.5}
-    .kvkk a{color:var(--gri)}
+    #formDurum{margin-top:12px;font-size:14px;min-height:21px}
+    .basarili{color:var(--basarili)}
+    .basarisiz{color:#F87171}   /* koyu zeminde okunur hata tonu */
+    .kvkk{font-size:13px;line-height:1.5;color:var(--koyu-ikincil);margin-top:14px}
   </style>
 </head>
 <body>
 <div class="sayfa">
 
-  <!-- Z-PATTERN 1: sol ust -->
+  <!-- Z-PATTERN 1 · sol üst -->
   <header class="ust">
     <div class="logo">
-      <div class="logo-ikon">⚡</div>
-      <span>{{ marka }}</span>
+      <!-- Kurumsal logo rozeti (Kılavuz s.9). Kendi zeminini taşıdığı için koyu
+           zeminde olduğu gibi korunur; kelime markası beyaza döner (s.11).
+           Köşe yarıçapı %6,4 — kılavuzda tanımlı orandır, değiştirilemez. -->
+      <svg class="rozet" viewBox="0 0 100 100" role="img" aria-label="SiparişN">
+        <rect width="100" height="100" rx="6.4" fill="#FF6B35"/>
+        <path fill-rule="evenodd" fill="#FFDE32" d="M82.5,13.28 L84.73,13.35 L85.19,13.9 L85.11,15.06 L75.13,51.94 L69.38,74.77 L68.69,75.23 L60.02,74.92 L57.87,74.53 L56.49,73.37 L49.58,62.5 L38.76,43.56 L33.38,60.87 L46.35,60.95 L46.97,61.57 L46.97,62.27 L25.48,89.52 L23.02,92.31 L21.72,92.39 L21.41,92.0 L21.49,91.3 L26.55,77.17 L29.32,68.63 L27.17,68.4 L15.81,68.48 L14.97,68.01 L14.89,67.0 L21.03,51.86 L25.79,37.5 L29.01,25.31 L29.93,17.62 L30.39,17.24 L31.24,17.08 L41.9,16.93 L42.9,17.24 L43.67,17.86 L46.2,22.36 L55.26,40.3 L61.09,51.09 L61.7,51.79 L69.22,22.67 L69.15,22.36 L65.92,22.13 L67.84,14.75 Z"/>
+      </svg>
+      <span class="marka">{{ marka }}</span>
     </div>
     <a class="ust-link" href="/dashboard">Yönetim Paneli →</a>
   </header>
 
   <div class="izgara">
-    <!-- SOL SUTUN: baslik + Z-PATTERN 3 (sol alt) -->
+    <!-- SOL SÜTUN -->
     <section>
-      <h1>Tüm siparişleriniz<br><span>tek ekranda.</span></h1>
+      <h1>Tüm siparişler,<br><em>tek ekranda.</em></h1>
       <p class="slogan">
-        Trendyol Yemek, Getir Yemek ve diğer platformlardan gelen siparişleri
-        ayrı ayrı takip etmeyin. {{ marka }} hepsini tek merkezde toplar;
-        ekibiniz uygulamalar arasında gezinmez, sipariş kaçmaz.
+        {{ marka }}, farklı yemek sipariş platformlarından gelen siparişleri tek bir
+        ekranda toplar. Çalışanlarınız uygulamalar arasında geçiş yapmadan siparişleri
+        takip eder, operasyon hızlanır.
       </p>
+
+      <!-- Z-PATTERN 3 · sol alt -->
       <div class="kartlar">
-        <div class="kart"><b>🍽️ Restoran &amp; Kafe</b><small>Yoğun saatte tek ekrandan akış kontrolü.</small></div>
-        <div class="kart"><b>🍔 Fast-food</b><small>Hızlı sipariş döngüsü, azalan hata payı.</small></div>
-        <div class="kart"><b>🛵 Paket servis</b><small>Teslimat durumlarını merkezden izleme.</small></div>
-        <div class="kart"><b>🏪 Küçük zincirler</b><small>Şubeler arası tek tip operasyon.</small></div>
+        <div class="kart"><h3>Restoran &amp; kafe</h3><p>Yoğun saatte tek ekrandan akış kontrolü.</p></div>
+        <div class="kart"><h3>Fast-food</h3><p>Hızlı sipariş döngüsü, azalan hata payı.</p></div>
+        <div class="kart"><h3>Paket servis</h3><p>Teslimat durumlarını merkezden izleme.</p></div>
+        <div class="kart"><h3>Küçük zincirler</h3><p>Şubeler arasında tek tip operasyon.</p></div>
       </div>
     </section>
 
-    <!-- SAG SUTUN: Z-PATTERN 2 (sag ust) sohbet + Z-PATTERN 4 (sag alt) form -->
+    <!-- SAĞ SÜTUN: Z-PATTERN 2 (sohbet) + 4 (form) -->
     <section>
       <div class="cam">
-        <div class="baslik"><span class="nokta"></span> {{ marka }} Akıllı Satış Asistanı</div>
+        <div class="kart-baslik"><span class="nokta"></span><h3>{{ marka }} Akıllı Satış Asistanı</h3></div>
 
         <div id="sohbetAlani">
-          <div class="balon bot">Merhaba! Ben {{ marka }} asistanıyım. Merkezi sipariş yönetimi, platform entegrasyonları ve kurulum süreci hakkında sorularınızı yanıtlayabilirim. Ne öğrenmek istersiniz?</div>
+          <div class="balon bot">Merhaba. {{ marka }}'in merkezi sipariş yönetimi, platform entegrasyonları ve kurulum süreci hakkındaki sorularınızı yanıtlayabilirim.</div>
         </div>
 
         <div class="satir">
-          <input id="mesajGirisi" type="text" placeholder="Sorunuzu yazın… (örn. Getir Yemek entegrasyonu var mı?)" autocomplete="off">
+          <input id="mesajGirisi" type="text" placeholder="Sorunuzu yazın" autocomplete="off">
           <button id="sorButonu">Sor</button>
         </div>
 
-        <!-- Z-PATTERN 4: gozun indigi son nokta -> donusum (lead formu) -->
+        <!-- Z-PATTERN 4 · sağ alt -->
         <div class="form-alani">
           <h2>Ücretsiz demo talep edin</h2>
-          <p>Bilgilerinizi bırakın, işletmenize özel kurulumu birlikte planlayalım.</p>
+          <p class="aciklama">Bilgilerinizi bırakın, kurulumu işletmenize göre birlikte planlayalım. Kurulum 10 dakika sürer.</p>
           <div class="form-izgara">
             <input id="isimGirisi" type="text" placeholder="Ad Soyad *">
             <input id="telefonGirisi" type="tel" placeholder="Telefon *">
@@ -175,8 +224,8 @@
           <button id="kaydetButonu" style="width:100%">Kaydet</button>
           <div id="formDurum"></div>
           <p class="kvkk">
-            Formu göndererek ad, telefon ve işletme bilgilerinizin demo süreci kapsamında
-            işlenmesine izin vermiş olursunuz. Detaylar için {{ marka }} KVKK Politikası.
+            Formu gönderdiğinizde ad, telefon ve işletme bilgileriniz demo süreci kapsamında
+            işlenir. Ayrıntılar {{ marka }} Kişisel Verilerin Korunması Politikası'ndadır.
           </p>
         </div>
       </div>
@@ -186,13 +235,12 @@
 
 <script>
 /* =========================================================
-   FRONTEND -> BACKEND BAGLANTISI
-   KRITIK: alan adlari backend ile BIREBIR ayni olmali.
-     sohbet  -> gonder: mesaj   / al: cevap
-     kayit   -> gonder: isim, telefon, isletme, mesaj
-   Bir harf farki baglantiyi koparir.
+   FRONTEND → BACKEND
+   KRİTİK: alan adları backend ile BİREBİR aynı olmalı.
+     sohbet → gönder: mesaj  / al: cevap
+     kayıt  → gönder: isim, telefon, isletme, mesaj
    ========================================================= */
-const API = '';   // ayni sunucudan servis edildigi icin bos; Wix'te Render adresi yazilir
+const API = '';
 
 const sohbetAlani  = document.getElementById('sohbetAlani');
 const mesajGirisi  = document.getElementById('mesajGirisi');
@@ -200,8 +248,7 @@ const sorButonu    = document.getElementById('sorButonu');
 const kaydetButonu = document.getElementById('kaydetButonu');
 const formDurum    = document.getElementById('formDurum');
 
-// Konusma gecmisi: backend'e gonderilir ki asistan baglami hatirlasin.
-let gecmis = [];
+let gecmis = [];   // asistanın bağlamı hatırlaması için
 
 function balonEkle(metin, sinif) {
   const div = document.createElement('div');
@@ -219,7 +266,7 @@ async function soruSor() {
   balonEkle(mesaj, 'ben');
   mesajGirisi.value = '';
   sorButonu.disabled = true;
-  const bekleyen = balonEkle('yazıyor…', 'bot');
+  const bekleyen = balonEkle('Yazıyor…', 'bot');
 
   try {
     const yanit = await fetch(API + '/api/sohbet', {
@@ -231,16 +278,15 @@ async function soruSor() {
 
     if (veri.basari) {
       bekleyen.textContent = veri.cevap;
-      // Gecmisi guncelle (son 10 mesajla sinirli tut - istek boyutu buyumesin)
       gecmis.push({ role: 'user', content: mesaj });
       gecmis.push({ role: 'assistant', content: veri.cevap });
-      gecmis = gecmis.slice(-10);
+      gecmis = gecmis.slice(-10);   // istek gövdesi şişmesin
     } else {
-      bekleyen.className = 'balon hata';
+      bekleyen.className = 'balon balon-hata';
       bekleyen.textContent = veri.hata || 'Yanıt alınamadı.';
     }
   } catch (e) {
-    bekleyen.className = 'balon hata';
+    bekleyen.className = 'balon balon-hata';
     bekleyen.textContent = 'Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.';
   } finally {
     sorButonu.disabled = false;
@@ -254,8 +300,7 @@ async function leadKaydet() {
   const isletme = document.getElementById('isletmeGirisi').value.trim();
   const not     = document.getElementById('notGirisi').value.trim();
 
-  // Istemci tarafi on kontrol; backend zaten tekrar dogruluyor.
-  if (!isim || !telefon) {
+  if (!isim || !telefon) {                 // backend zaten tekrar doğruluyor
     formDurum.className = 'basarisiz';
     formDurum.textContent = 'Ad ve telefon alanları zorunludur.';
     return;
@@ -275,7 +320,7 @@ async function leadKaydet() {
 
     if (veri.basari) {
       formDurum.className = 'basarili';
-      formDurum.textContent = '✓ ' + veri.mesaj;
+      formDurum.textContent = veri.mesaj;
       ['isimGirisi','telefonGirisi','isletmeGirisi','notGirisi']
         .forEach(id => document.getElementById(id).value = '');
     } else {

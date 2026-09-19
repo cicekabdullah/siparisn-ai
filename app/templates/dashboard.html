@@ -4,73 +4,159 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ marka }} — Yönetim Paneli</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='6.4' fill='%23FF6B35'/%3E%3Ctext x='50' y='73' font-family='Poppins,Arial,sans-serif' font-size='68' font-weight='700' fill='%23FFFFFF' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
-    :root{--turuncu:#FF6B35;--lacivert:#1F2937;--kenar:#E5E7EB;--gri:#6B7280;--zemin:#F9FAFB}
+    /* =====================================================================
+       SiparişN Yönetim Paneli — Kurumsal Kimlik Kılavuzu Sürüm 1.0
+       AÇIK ZEMİN kuralları geçerli (Kılavuz s.20).
+       ===================================================================== */
+    :root{
+      --turuncu:#FF6B35;        /* s.20: beyaz zeminde METİN olarak kullanılmaz;
+                                   yalnızca 18 pt+ başlık, grafik öğe, buton zemini */
+      --turuncu-koyu:#C2410C;   /* Vurgu / link / beyaz metinli buton (5,2:1) */
+      --lacivert:#1F2937;       /* Başlık (14,6:1) */
+      --govde:#374151;          /* Gövde metni (10,3:1) */
+      --ikincil:#6B7280;        /* İkincil metin ve dipnot (4,8:1) */
+
+      --yuzey:#F9FAFB;          /* s.7: Arayüz kart zemini */
+      --krem:#FFF4EE;           /* s.7: Doküman ve sunum zemini */
+      --ayrac:#E5E7EB;          /* s.7: Çizgi ve kenarlık */
+
+      --basarili:#16A34A;       /* Sipariş onaylandı */
+      --uyari:#F59E0B;          /* Hazırlık gecikti */
+      --hata:#DC2626;           /* Sipariş iptal edildi */
+
+      --r:8px;                  /* s.26: buton ve kartlarda 8 px */
+    }
+
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Poppins',system-ui,sans-serif;background:var(--zemin);color:var(--lacivert);padding:26px 16px 60px}
+
+    body{
+      font-family:'Inter',system-ui,sans-serif;
+      font-size:16px;line-height:1.6;
+      color:var(--govde);
+      background:var(--yuzey);
+      padding:26px 16px 60px;
+      -webkit-font-smoothing:antialiased;
+    }
     .sayfa{max-width:1120px;margin:0 auto}
 
+    h1,h2,h3,.marka,button{font-family:'Poppins',system-ui,sans-serif}
+    h1{font-size:22px;line-height:1.25;font-weight:600;color:var(--lacivert)}
+
     /* ================= F-PATTERN =================
-       Goz once ust yatay seridi (baslik/ozet), sonra ikinci yatay seridi
-       (tablo basligi) tarar, ardindan SOL kolonda asagi iner.
-       Bu yuzden en onemli bilgi olan ISIM en solda yer alir. */
+       Göz önce üst yatay şeridi (özet), sonra ikinci yatay şeridi (tablo
+       başlığı) tarar, ardından SOL kolonda aşağı iner. Bu yüzden en önemli
+       bilgi olan İSİM en soldadır. */
 
-    header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.25rem}
-    .logo-ikon{width:34px;height:34px;border-radius:10px;background:var(--turuncu);color:#fff;display:grid;place-items:center}
-    .ust-link{color:var(--gri);text-decoration:none;font-size:.88rem;font-weight:500;border:1px solid var(--kenar);padding:8px 15px;border-radius:999px;background:#fff}
-    .ust-link:hover{border-color:var(--turuncu);color:var(--turuncu)}
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+    .logo{display:flex;align-items:center;gap:11px}
+    /* Kılavuz s.12: beyaz zeminde ana logo orijinal renginde kullanılır */
+    .rozet{width:36px;height:36px;flex-shrink:0;display:block}
+    .marka{font-size:20px;font-weight:600;letter-spacing:-.3px;color:var(--lacivert)}
+    .marka span{font-weight:500;color:var(--ikincil)}
+    .ust-link{
+      font-family:'Poppins',sans-serif;font-size:15px;font-weight:500;letter-spacing:.02em;
+      color:var(--turuncu-koyu);text-decoration:none;
+      border:1px solid var(--ayrac);background:#fff;padding:9px 17px;border-radius:999px;
+    }
+    .ust-link:hover{border-color:var(--turuncu-koyu)}
 
-    /* F'nin birinci yatay cizgisi: ozet kartlari */
+    /* F'nin birinci yatay çizgisi: özet kartları */
     .ozet{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
     @media(max-width:700px){.ozet{grid-template-columns:1fr}}
-    .ozet-kart{background:#fff;border:1px solid var(--kenar);border-radius:14px;padding:18px}
-    .ozet-kart small{color:var(--gri);font-size:.78rem;text-transform:uppercase;letter-spacing:.6px}
-    .ozet-kart b{display:block;font-size:1.9rem;margin-top:6px;letter-spacing:-1px}
-    .ozet-kart.vurgu b{color:var(--turuncu)}
+    .ozet-kart{background:#fff;border:1px solid var(--ayrac);border-radius:var(--r);padding:18px}
+    .ozet-kart .etiket{
+      font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--ikincil);
+    }
+    .ozet-kart .deger{
+      font-family:'Poppins',sans-serif;font-size:32px;line-height:1.15;font-weight:600;
+      letter-spacing:-1px;color:var(--lacivert);margin-top:6px;
+      font-variant-numeric:tabular-nums;          /* s.18: sekmeli rakam */
+    }
+    /* Turuncu 18 pt üzeri sayıda serbesttir (s.20) — 32 px başlık ölçüsündedir */
+    .ozet-kart.vurgu{background:var(--krem);border-color:#FFD9C7}
+    .ozet-kart.vurgu .deger{color:var(--turuncu-koyu)}
+    .ozet-kart .deger.kucuk{font-size:17px;font-weight:500;letter-spacing:0}
 
     .arac-cubugu{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-    #aramaGirisi{flex:1;min-width:220px;font-family:inherit;font-size:.9rem;padding:11px 14px;border:1px solid var(--kenar);border-radius:11px;outline:none;background:#fff}
-    #aramaGirisi:focus{border-color:var(--turuncu)}
-    button{font-family:inherit;font-weight:600;font-size:.9rem;color:#fff;background:var(--turuncu);border:none;border-radius:11px;padding:11px 20px;cursor:pointer}
-    button:hover{filter:brightness(1.08)}
+    #aramaGirisi{
+      flex:1;min-width:240px;font-family:'Inter',sans-serif;font-size:15px;
+      color:var(--govde);background:#fff;
+      padding:11px 14px;border:1px solid var(--ayrac);border-radius:var(--r);outline:none;
+    }
+    #aramaGirisi::placeholder{color:var(--ikincil)}
+    #aramaGirisi:focus{border-color:var(--turuncu-koyu)}
 
-    .tablo-kutu{background:#fff;border:1px solid var(--kenar);border-radius:14px;overflow:hidden}
+    /* Beyaz metinli buton zemini daima #C2410C (Kılavuz s.21) */
+    button{
+      font-family:'Poppins',sans-serif;font-size:15px;font-weight:500;letter-spacing:.02em;
+      color:#fff;background:var(--turuncu-koyu);border:none;border-radius:var(--r);
+      padding:11px 20px;cursor:pointer;transition:filter .18s;
+    }
+    button:hover{filter:brightness(1.12)}
+
+    .tablo-kutu{background:#fff;border:1px solid var(--ayrac);border-radius:var(--r);overflow:hidden}
     table{width:100%;border-collapse:collapse}
-    /* F'nin ikinci yatay cizgisi: tablo basligi */
-    th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;color:var(--gri);
-       padding:13px 16px;background:var(--zemin);border-bottom:1px solid var(--kenar);white-space:nowrap}
-    td{padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:.9rem;vertical-align:top}
+    /* F'nin ikinci yatay çizgisi: tablo başlığı */
+    th{
+      font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--ikincil);text-align:left;
+      padding:13px 16px;background:var(--yuzey);border-bottom:1px solid var(--ayrac);white-space:nowrap;
+    }
+    td{padding:14px 16px;border-bottom:1px solid #F3F4F6;font-size:15px;vertical-align:top}
     tr:last-child td{border-bottom:none}
-    tr:hover td{background:#FFF7F3}
-    /* F'nin dikey govdesi: en onemli kolon (isim) solda ve vurgulu */
-    td.isim{font-weight:600}
-    td.telefon{white-space:nowrap}
-    td.mesaj{color:var(--gri);max-width:340px}
-    td.tarih{color:var(--gri);white-space:nowrap;font-size:.83rem}
-    .bos{padding:46px 20px;text-align:center;color:var(--gri)}
+    tr:hover td{background:var(--krem)}
+    /* F'nin dikey gövdesi: en önemli kolon solda ve vurgulu */
+    td.isim{font-weight:600;color:var(--lacivert)}
+    /* s.18: sipariş no, tutar ve saat gibi alanlar sekmeli rakamla hizalanır */
+    td.telefon,td.tarih{font-variant-numeric:tabular-nums;white-space:nowrap}
+    td.tarih{color:var(--ikincil);font-size:14px}
+    td.mesaj{color:var(--govde);max-width:320px}
+    .yok{color:#9CA3AF}
+
+    /* Durum etiketi — s.26: tam yuvarlak (pill) form */
+    .etiket-durum{
+      display:inline-block;font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;
+      letter-spacing:.02em;padding:3px 11px;border-radius:999px;white-space:nowrap;
+    }
+    .etiket-yeni{background:#DCFCE7;color:#15803D}      /* Başarılı ailesi */
+    .etiket-bekliyor{background:#FEF3C7;color:#B45309}  /* Uyarı ailesi */
+
+    .bos{padding:48px 20px;text-align:center;color:var(--ikincil)}
   </style>
 </head>
 <body>
 <div class="sayfa">
 
   <header>
-    <div class="logo"><div class="logo-ikon">⚡</div><span>{{ marka }} · Yönetim Paneli</span></div>
+    <div class="logo">
+      <!-- Ana logo, beyaz zeminde orijinal renginde (Kılavuz s.12) -->
+      <svg class="rozet" viewBox="0 0 100 100" role="img" aria-label="SiparişN">
+        <rect width="100" height="100" rx="6.4" fill="#FF6B35"/>
+        <path fill-rule="evenodd" fill="#FFDE32" d="M82.5,13.28 L84.73,13.35 L85.19,13.9 L85.11,15.06 L75.13,51.94 L69.38,74.77 L68.69,75.23 L60.02,74.92 L57.87,74.53 L56.49,73.37 L49.58,62.5 L38.76,43.56 L33.38,60.87 L46.35,60.95 L46.97,61.57 L46.97,62.27 L25.48,89.52 L23.02,92.31 L21.72,92.39 L21.41,92.0 L21.49,91.3 L26.55,77.17 L29.32,68.63 L27.17,68.4 L15.81,68.48 L14.97,68.01 L14.89,67.0 L21.03,51.86 L25.79,37.5 L29.01,25.31 L29.93,17.62 L30.39,17.24 L31.24,17.08 L41.9,16.93 L42.9,17.24 L43.67,17.86 L46.2,22.36 L55.26,40.3 L61.09,51.09 L61.7,51.79 L69.22,22.67 L69.15,22.36 L65.92,22.13 L67.84,14.75 Z"/>
+      </svg>
+      <h1 class="marka">{{ marka }} <span>· Yönetim Paneli</span></h1>
+    </div>
     <a class="ust-link" href="/">← Karşılama Sayfası</a>
   </header>
 
-  <!-- F-PATTERN: birinci yatay tarama seridi -->
+  <!-- F-PATTERN: birinci yatay tarama şeridi -->
   <div class="ozet">
-    <div class="ozet-kart vurgu"><small>Toplam Kayıt</small><b id="toplamKayit">–</b></div>
-    <div class="ozet-kart"><small>Bugün Gelen</small><b id="bugunGelen">–</b></div>
-    <div class="ozet-kart"><small>Son Kayıt</small><b id="sonKayit" style="font-size:1.05rem;font-weight:500">–</b></div>
+    <div class="ozet-kart vurgu"><div class="etiket">Toplam Kayıt</div><div class="deger" id="toplamKayit">–</div></div>
+    <div class="ozet-kart"><div class="etiket">Bugün Gelen</div><div class="deger" id="bugunGelen">–</div></div>
+    <div class="ozet-kart"><div class="etiket">Son Kayıt</div><div class="deger kucuk" id="sonKayit">–</div></div>
   </div>
 
   <div class="arac-cubugu">
-    <input id="aramaGirisi" type="text" placeholder="Ad, telefon veya işletme adında ara…">
+    <input id="aramaGirisi" type="text" placeholder="Ad, telefon veya işletme adında ara">
     <button id="yenileButonu">Yenile</button>
   </div>
 
@@ -78,15 +164,16 @@
     <table>
       <thead>
         <tr>
-          <th style="width:18%">Ad Soyad</th>
-          <th style="width:15%">Telefon</th>
-          <th style="width:18%">İşletme</th>
+          <th style="width:17%">Ad Soyad</th>
+          <th style="width:14%">Telefon</th>
+          <th style="width:17%">İşletme</th>
           <th>Mesaj / Not</th>
-          <th style="width:15%">Tarih</th>
+          <th style="width:9%">Durum</th>
+          <th style="width:14%">Tarih</th>
         </tr>
       </thead>
       <tbody id="tabloGovde">
-        <tr><td colspan="5" class="bos">Yükleniyor…</td></tr>
+        <tr><td colspan="6" class="bos">Yükleniyor…</td></tr>
       </tbody>
     </table>
   </div>
@@ -94,19 +181,29 @@
 
 <script>
 /* Panel, backend'in GET /api/leads ucundan beslenir.
-   Donen anahtarlar backend ile birebir ayni: leadler[].isim / telefon / isletme / mesaj / tarih */
+   Dönen anahtarlar backend ile birebir aynı:
+   leadler[].isim / telefon / isletme / mesaj / tarih */
 const API = '';
 let tumLeadler = [];
 
+function tarihNesnesi(metin) {
+  return new Date(String(metin).replace(' ', 'T'));
+}
+
 function tarihBicimle(metin) {
-  const t = new Date(metin.replace(' ', 'T'));
+  const t = tarihNesnesi(metin);
   if (isNaN(t)) return metin;
   return t.toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric',
                                      hour:'2-digit', minute:'2-digit' });
 }
 
+function bugunMu(metin) {
+  const t = tarihNesnesi(metin);
+  return !isNaN(t) && t.toDateString() === new Date().toDateString();
+}
+
+// XSS'e karşı: veriyi innerHTML'e gömmeden önce kaçır.
 function kacir(metin) {
-  // XSS'e karsi basit koruma: veriyi innerHTML'e gomerken kacir.
   return String(metin).replace(/[&<>"']/g, k => (
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]
   ));
@@ -116,31 +213,32 @@ function tabloyuCiz(liste) {
   const govde = document.getElementById('tabloGovde');
 
   if (!liste.length) {
-    govde.innerHTML = '<tr><td colspan="5" class="bos">Henüz kayıt yok. ' +
+    govde.innerHTML = '<tr><td colspan="6" class="bos">Henüz kayıt yok. ' +
                       'Karşılama sayfasındaki formdan ilk kaydı oluşturabilirsiniz.</td></tr>';
     return;
   }
 
-  // Dongu: her lead icin bir satir uret (en yeniden eskiye backend siraliyor).
-  govde.innerHTML = liste.map(l => `
+  // Döngü: her lead için bir satır (backend en yeniden eskiye sıralıyor).
+  govde.innerHTML = liste.map(l => {
+    const yeni = bugunMu(l.tarih);
+    const etiket = yeni
+      ? '<span class="etiket-durum etiket-yeni">Yeni</span>'
+      : '<span class="etiket-durum etiket-bekliyor">Bekliyor</span>';
+    return `
     <tr>
       <td class="isim">${kacir(l.isim)}</td>
       <td class="telefon">${kacir(l.telefon)}</td>
-      <td>${kacir(l.isletme) || '<span style="color:#9CA3AF">—</span>'}</td>
-      <td class="mesaj">${kacir(l.mesaj) || '—'}</td>
+      <td>${kacir(l.isletme) || '<span class="yok">—</span>'}</td>
+      <td class="mesaj">${kacir(l.mesaj) || '<span class="yok">—</span>'}</td>
+      <td>${etiket}</td>
       <td class="tarih">${tarihBicimle(l.tarih)}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 function ozetiGuncelle(liste) {
   document.getElementById('toplamKayit').textContent = liste.length;
-
-  const bugun = new Date().toDateString();
-  const bugunkuler = liste.filter(l => {
-    const t = new Date(l.tarih.replace(' ', 'T'));
-    return !isNaN(t) && t.toDateString() === bugun;
-  });
-  document.getElementById('bugunGelen').textContent = bugunkuler.length;
+  document.getElementById('bugunGelen').textContent = liste.filter(l => bugunMu(l.tarih)).length;
   document.getElementById('sonKayit').textContent =
     liste.length ? tarihBicimle(liste[0].tarih) : '–';
 }
@@ -156,11 +254,11 @@ async function leadleriGetir() {
       ozetiGuncelle(tumLeadler);
     } else {
       document.getElementById('tabloGovde').innerHTML =
-        '<tr><td colspan="5" class="bos">' + kacir(veri.hata || 'Kayıtlar getirilemedi.') + '</td></tr>';
+        '<tr><td colspan="6" class="bos">' + kacir(veri.hata || 'Kayıtlar getirilemedi.') + '</td></tr>';
     }
   } catch (e) {
     document.getElementById('tabloGovde').innerHTML =
-      '<tr><td colspan="5" class="bos">Sunucuya ulaşılamadı.</td></tr>';
+      '<tr><td colspan="6" class="bos">Sunucuya ulaşılamadı.</td></tr>';
   }
 }
 
