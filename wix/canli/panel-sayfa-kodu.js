@@ -1,24 +1,31 @@
 import { leadleriGetir } from 'backend/siparisn.jsw';
 
-/* SiparişN — Yönetici Paneli
-   Bileşenler: #tabloKayitlar (Table), #butonYenile (Button), #metinOzet (Text)
+/* =========================================================
+   SiparişN — Yönetici Paneli
 
-   Kayıtlar artık gerçek bir tablo bileşeninde gösteriliyor: her kayıt bir
-   satır, her bilgi ayrı bir hücre. Sütunlar koddan tanımlanıyor ki başlık
-   adı ile Flask API'sinin döndürdüğü alan adı (dataPath) tek yerde eşleşsin.
+   #repeater1        lead listesi
+     #box291           satır kutusu (repeater item)
+       #metinIsim        Ad Soyad
+       #metinTelefon     Telefon
+   #butonYenile      listeyi yeniler
+   #metinOzet        "Toplam X kayıt"
 
-   F-Pattern: en önemli kolon (ad soyad) en solda. */
-
-const SUTUNLAR = [
-  { id: 'isim',    dataPath: 'isim',    label: 'Ad Soyad',     type: 'string', width: 230 },
-  { id: 'telefon', dataPath: 'telefon', label: 'Numara',       type: 'string', width: 180 },
-  { id: 'isletme', dataPath: 'isletme', label: 'İşletme Adı',  type: 'string', width: 230 },
-  { id: 'tarih',   dataPath: 'tarih',   label: 'Kayıt Tarihi', type: 'string', width: 160 }
-];
+   Akış: Ana Sayfa'daki #butonKaydet'e basılınca #girisIsim ve
+   #girisTelefon değerleri backend/siparisn.jsw üzerinden Flask
+   API'sine gidip SQLite'a yazılıyor. Bu sayfa aynı API'den
+   okuyup repeater'a basıyor; yani panel her açılışta güncel.
+   ========================================================= */
 
 $w.onReady(function () {
   $w('#butonYenile').label = 'Yenile';
-  $w('#tabloKayitlar').columns = SUTUNLAR;
+
+  /* Repeater satırlarını doldurma kuralı:
+     satır İÇİNDE $w değil $item kullanılır. $w kullanılırsa
+     bütün satırlar aynı veriyle dolar — klasik Velo hatası. */
+  $w('#repeater1').onItemReady(function ($item, veri) {
+    $item('#metinIsim').text = veri.isim;
+    $item('#metinTelefon').text = veri.telefon;
+  });
 
   $w('#butonYenile').onClick(listeyiYukle);
   listeyiYukle();
@@ -32,40 +39,28 @@ async function listeyiYukle() {
 
     if (veri.basari) {
       // Backend kayıtları en yeniden eskiye sıralı döndürüyor.
-      $w('#tabloKayitlar').rows = veri.leadler.map(satirHazirla);
+      $w('#repeater1').data = veri.leadler.map(satirHazirla);
       $w('#metinOzet').text = veri.adet > 0
         ? 'Toplam ' + veri.adet + ' kayıt'
         : 'Henüz kayıt yok.';
     } else {
-      $w('#tabloKayitlar').rows = [];
+      $w('#repeater1').data = [];
       $w('#metinOzet').text = veri.hata || 'Kayıtlar getirilemedi.';
     }
   } catch (hata) {
     console.error('Liste hatasi:', hata);
-    $w('#tabloKayitlar').rows = [];
+    $w('#repeater1').data = [];
     $w('#metinOzet').text = 'Sunucuya ulaşılamadı.';
   }
 }
 
-/* API'den gelen kaydı tablonun beklediği satır nesnesine çevirir.
-   _id alanı zorunlu ve METİN olmalı; backend zaten metin olarak gönderiyor.
-   Boş kalan hücreye tire koyuyoruz ki tablo delik görünmesin. */
+/* API'den gelen kaydı repeater'ın beklediği satır nesnesine çevirir.
+   _id alanı zorunlu ve METİN olmalı; backend zaten metin gönderiyor.
+   Boş kalan alana tire koyuyoruz ki satır delik görünmesin. */
 function satirHazirla(lead) {
   return {
     _id: String(lead._id),
     isim: lead.isim || '—',
-    telefon: lead.telefon || '—',
-    isletme: lead.isletme || '—',
-    tarih: tarihBicimle(lead.tarih)
+    telefon: lead.telefon || '—'
   };
-}
-
-// '2026-09-21 10:02:39.110' -> '21.09.2026 10:02'
-function tarihBicimle(metin) {
-  const t = new Date(String(metin).replace(' ', 'T'));
-  if (isNaN(t)) return metin;
-  return t.toLocaleString('tr-TR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
 }

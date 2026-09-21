@@ -69,21 +69,23 @@ Kutu kendi kendine en alta kaymadığından ekranda son 4 mesaj tutuluyor.
 İletişim formundaki "İşletmeniz" alanı sayfadan kaldırıldı; bu yüzden
 yönetici panelindeki **İşletme Adı** sütunu boş gelir.
 
-**Panel sayfası (3 bileşen)**
+**Panel sayfası (5 bileşen)**
 
 | ID | Tür | Görev |
 |---|---|---|
-| `tabloKayitlar` | Table | Lead kayıtları — Ad Soyad / Numara / İşletme Adı / Kayıt Tarihi |
+| `repeater1` | Repeater | Lead listesi |
+| `box291` | Container | Satır kutusu (repeater item) |
+| `metinIsim` | Text (satır İÇİNDE) | Ad Soyad |
+| `metinTelefon` | Text (satır İÇİNDE) | Telefon |
 | `butonYenile` | Button | Listeyi yeniler |
 | `metinOzet` | Text | "Toplam X kayıt" |
 
-Tablonun sütunları Repeater yerine **kod** tarafından tanımlanır
-(`panel-sayfa-kodu.js` içindeki `SUTUNLAR`), böylece sütun başlığı ile
-Flask API'sinin döndürdüğü alan adı tek yerde eşleşir.
+Satır içindeki metinler `$w` ile değil `$item` ile doldurulur; `$w`
+kullanılırsa bütün satırlar aynı veriyle dolar (klasik Velo hatası).
 
-Tablo renkleri Kurumsal Kimlik Kılavuzu'na göre:
-başlık `#C2410C` + beyaz Poppins, satırlar beyaz / `#FFF4EE`,
-ilk kolon `#1F2937`, diğer hücreler `#374151`, köşeler 8px.
+Not: Wix ID'leri sayfa başına üretildiği için Home sayfasındaki `box291`
+(sohbet kartı) ile Panel sayfasındaki `box291` (satır kutusu) farklı
+öğelerdir; ikisi aynı ada sahip olsa da karışmaz.
 
 ## Veri akışı
 
