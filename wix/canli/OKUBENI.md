@@ -43,21 +43,31 @@ SiparişN'e ait içerik taşımıyordu.
 | `text221` | Text | "SiparişN" kelime markası |
 | `menu1` | Menu | Site menüsü (sayfalarla eşleşir) |
 
-**Home sayfası (11 bileşen)**
+**Home sayfası (10 bileşen)**
+
+Sohbet kartı yapısı: `section19 > box201` içinde `#button21` (kartın dışında)
+ve `#box291` (kart) yan yana durur; kart açılınca düğme gizlenir.
 
 | ID | Tür | Görev |
 |---|---|---|
+| `button21` | Button | "Asistana sor" — sohbeti açar (kartın DIŞINDA) |
+| `box291` | Container | Sohbet kartı |
+| `textBox1` | Text Box | AI cevapları — yazışma dökümü, readOnly |
+| `textBox2` | Text Box | Kullanıcının sorusu |
+| `button20` | Button | "Gönder" — soruyu yollar |
+| `button22` | Button | "Kapat" — sohbeti kapatır |
 | `girisIsim` | Text Input | Ad Soyad |
 | `girisTelefon` | Text Input | Telefon |
-| `girisIsletme` | Text Input | İşletme adı |
 | `butonKaydet` | Button | Gönder — zemin `#C2410C` |
 | `metinDurum` | Text | Form geri bildirimi |
-| `butonBalon` | Button | "Asistana sor" — sohbeti açar |
-| `kutuSohbet` | Container | Sohbet paneli zemini |
-| `butonKapat` | Button | Sohbeti kapatır |
-| `metinCevap` | Text | Yazışma (HTML baloncuklar) |
-| `girisMesaj` | Text Input | Soru alanı |
-| `butonSor` | Button | Sor |
+
+`textBox1` bir Text öğesi değil, çok satırlı **giriş kutusu**. Giriş kutuları
+yalnızca düz metin taşıdığı için (`.value`, `.html` yok) yazışma renkli
+baloncuk yerine `Siz:` / `SiparişN:` satırları hâlinde yazılıyor.
+Kutu kendi kendine en alta kaymadığından ekranda son 4 mesaj tutuluyor.
+
+İletişim formundaki "İşletmeniz" alanı sayfadan kaldırıldı; bu yüzden
+yönetici panelindeki **İşletme Adı** sütunu boş gelir.
 
 **Panel sayfası (3 bileşen)**
 

@@ -2,40 +2,65 @@ import { leadKaydet, sohbetGonder, sunucuyuUyandir } from 'backend/siparisn.jsw'
 
 /* =========================================================
    SiparişN — Ana Sayfa
-   Lead formu : #metinBaslik #girisIsim #girisTelefon #butonKaydet #metinDurum
-   Chatbot    : #butonBalon #kutuSohbet #butonKapat #metinCevap #girisMesaj #butonSor
-   Backend    : backend/siparisn.jsw -> https://siparisn-ai.onrender.com
+
+   Chatbot (section19 > box201)
+     #button21  kartın DIŞINDA — sohbeti açar
+     #box291    sohbet kartı, içinde:
+       #textBox1  AI cevapları (yazışma dökümü)
+       #textBox2  kullanıcının sorusu
+       #button20  soruyu gönderir
+       #button22  sohbeti kapatır
+
+   İletişim formu : #girisIsim #girisTelefon #butonKaydet #metinDurum
+   Backend        : backend/siparisn.jsw -> https://siparisn-ai.onrender.com
+
+   NOT — yazışma neden baloncuklu değil:
+   #textBox1 bir Text öğesi değil, çok satırlı GİRİŞ KUTUSU (Text Box).
+   Giriş kutuları yalnızca düz metin taşır (.value); .html kabul etmediği
+   için renkli baloncuk çizilemiyor. Bu yüzden yazışma 'Siz:' / 'SiparişN:'
+   satırları hâlinde yazılıyor ve kullanıcı içine yazamasın diye readOnly.
    ========================================================= */
 
-let gecmis = [];      // asistanın bağlamı hatırlaması için
-let yazisma = [];     // ekrana basılan konuşma
+const KARSILAMA = 'Merhaba. SiparişN\'in merkezi sipariş yönetimi, platform ' +
+                  'entegrasyonları ve kurulum süreci hakkındaki sorularınızı ' +
+                  'yanıtlayabilirim.';
+
+/* Giriş kutusu kendi kendine en alta kaymadığı için yazışmayı kısa
+   tutuyoruz; böylece en son cevap kutunun içinde görünür kalıyor. */
+const EKRANDA_TUTULACAK = 4;
+
+let gecmis = [];     // asistanın bağlamı hatırlaması için (backend'e gider)
+let yazisma = [];    // ekrana basılan konuşma
 
 $w.onReady(function () {
   // --- Arayüz metinleri tek yerden (marka dili tutarlı kalsın) ---
-  $w('#metinBaslik').text = 'Ücretsiz demo talep edin';
-  $w('#butonKaydet').label = 'Kaydet';
-  $w('#girisIsim').placeholder = 'Ad Soyad *';
-  $w('#girisTelefon').placeholder = 'Telefon *';
+  $w('#button21').label = 'Asistana sor';
+  $w('#button20').label = 'Gönder';
+  $w('#button22').label = 'Kapat';
+  $w('#textBox1').label = 'SiparişN Asistanı';
+  $w('#textBox1').placeholder = '';
+  $w('#textBox1').readOnly = true;
+  $w('#textBox2').placeholder = 'Sorunuzu buraya sorun';
+
   $w('#metinDurum').text = '';
 
-  $w('#butonBalon').label = 'Asistana sor';
-  $w('#butonSor').label = 'Sor';
-  $w('#butonKapat').label = 'Kapat';
-  $w('#girisMesaj').placeholder = 'Sorunuzu yazın';
-
   // --- Başlangıç: sohbet kapalı, sadece açma düğmesi görünür ---
+  yazisma = [{ kim: 'bot', metin: KARSILAMA }];
+  ekranaBas();
   sekmeyiKapat();
-  yaz('bot', 'Merhaba. SiparişN\'in merkezi sipariş yönetimi, platform entegrasyonları ve kurulum süreci hakkındaki sorularınızı yanıtlayabilirim.');
 
   // --- Olaylar ---
-  $w('#butonBalon').onClick(sekmeyiAc);
-  $w('#butonKapat').onClick(sekmeyiKapat);
-  $w('#butonSor').onClick(soruSor);
-  $w('#butonKaydet').onClick(formuGonder);
+  $w('#button21').onClick(sekmeyiAc);
+  $w('#button22').onClick(sekmeyiKapat);
+  $w('#button20').onClick(soruSor);
 
-  $w('#girisMesaj').onKeyPress(function (olay) {
-    if (olay.key === 'Enter') soruSor();
+  /* Enter gönderir, Shift+Enter alt satıra geçer.
+     Çok satırlı kutuda Enter normalde satır atlar; sohbet alışkanlığına uyduruyoruz. */
+  $w('#textBox2').onKeyPress(function (olay) {
+    if (olay.key === 'Enter' && !olay.shiftKey) soruSor();
   });
+
+  $w('#butonKaydet').onClick(formuGonder);
   $w('#girisTelefon').onKeyPress(function (olay) {
     if (olay.key === 'Enter') formuGonder();
   });
@@ -44,46 +69,37 @@ $w.onReady(function () {
   sunucuyuUyandir().catch(function () {});
 });
 
-/* ---------- Sohbet sekmesini aç / kapat ---------- */
+/* ---------- Sohbet kartını aç / kapat ----------
+   #button21 kartın dışında durduğu için kartla birlikte gizlenmiyor;
+   biri görünürken diğeri gizli oluyor. collapse() öğeyi yerinden de
+   kaldırır, hide() ise boş yer bırakırdı. */
 function sekmeyiAc() {
-  $w('#kutuSohbet').expand();
-  $w('#metinCevap').expand();
-  $w('#girisMesaj').expand();
-  $w('#butonSor').expand();
-  $w('#butonKapat').expand();
-  $w('#butonBalon').collapse();
+  $w('#box291').expand();
+  $w('#button21').collapse();
+  $w('#textBox2').focus();
 }
 
 function sekmeyiKapat() {
-  $w('#kutuSohbet').collapse();
-  $w('#metinCevap').collapse();
-  $w('#girisMesaj').collapse();
-  $w('#butonSor').collapse();
-  $w('#butonKapat').collapse();
-  $w('#butonBalon').expand();
+  $w('#box291').collapse();
+  $w('#button21').expand();
 }
 
-/* ---------- Yazışmayı ekrana basma ----------
-   Kullanıcıdan gelen metni ham HTML olarak basmıyoruz; önce kaçırıyoruz. */
-function kacir(metin) {
-  return String(metin)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+/* ---------- Yazışmayı ekrana basma ---------- */
+function ekranaBas() {
+  $w('#textBox1').value = yazisma.map(function (s) {
+    return (s.kim === 'ben' ? 'Siz' : 'SiparişN') + ': ' + s.metin;
+  }).join('\n\n');
 }
 
 function yaz(kim, metin) {
   yazisma.push({ kim: kim, metin: metin });
-  if (yazisma.length > 12) yazisma = yazisma.slice(-12);
-
-  const html = yazisma.map(function (s) {
-    const renk = s.kim === 'ben' ? '#FF8A5B' : '#374151';
-    const hiza = s.kim === 'ben' ? 'right' : 'left';
-    return '<p style="color:' + renk + ';text-align:' + hiza + ';margin:0 0 8px 0;">' + kacir(s.metin) + '</p>';
-  }).join('');
-
-  $w('#metinCevap').html = html;
+  if (yazisma.length > EKRANDA_TUTULACAK) {
+    yazisma = yazisma.slice(-EKRANDA_TUTULACAK);
+  }
+  ekranaBas();
 }
 
+// 'Yazıyor...' satırını gerçek cevapla değiştirir.
 function sonSatiriDegistir(metin) {
   if (yazisma.length) yazisma.pop();
   yaz('bot', metin);
@@ -92,12 +108,12 @@ function sonSatiriDegistir(metin) {
 /* ---------- 1) AI SOHBETİ ----------
    KRİTİK: backend ile birebir aynı kelimeler -> mesaj / cevap */
 async function soruSor() {
-  const mesaj = $w('#girisMesaj').value.trim();
+  const mesaj = $w('#textBox2').value.trim();
   if (!mesaj) return;
 
   yaz('ben', mesaj);
-  $w('#girisMesaj').value = '';
-  $w('#butonSor').disable();
+  $w('#textBox2').value = '';
+  $w('#button20').disable();
   yaz('bot', 'Yazıyor...');
 
   try {
@@ -115,11 +131,14 @@ async function soruSor() {
     console.error('Sohbet hatasi:', hata);
     sonSatiriDegistir('Sunucuya ulaşılamadı, lütfen tekrar deneyin.');
   } finally {
-    $w('#butonSor').enable();
+    $w('#button20').enable();
+    $w('#textBox2').focus();
   }
 }
 
-/* ---------- 2) LEAD KAYDI ---------- */
+/* ---------- 2) LEAD KAYDI ----------
+   İşletme alanı sayfadan kaldırıldı; backend ve Flask bu alanı
+   isteğe bağlı kabul ettiği için boş gönderiyoruz. */
 async function formuGonder() {
   const isim = $w('#girisIsim').value.trim();
   const telefon = $w('#girisTelefon').value.trim();
@@ -131,7 +150,7 @@ async function formuGonder() {
   }
 
   $w('#butonKaydet').disable();
-  $w('#metinDurum').text = 'Kaydediliyor...';
+  $w('#metinDurum').text = 'Gönderiliyor...';
 
   try {
     const veri = await leadKaydet({ isim: isim, telefon: telefon, isletme: '' });
