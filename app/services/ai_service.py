@@ -124,6 +124,15 @@ class AIService:
                 "Yapay zekâ servisi zaman aşımına uğradı, lütfen tekrar deneyin."
             ) from hata
         except requests.exceptions.HTTPError as hata:
+            # Kullaniciya teknik ayrinti gostermiyoruz ama sunucu gunlugune
+            # Groq'un kendi hata govdesini yaziyoruz; 404/401 gibi durumlarin
+            # sebebi (yanlis model, gecersiz anahtar) ancak burada gorulur.
+            current_app.logger.error(
+                "Groq hatasi: HTTP %s - model=%s - govde=%s",
+                yanit.status_code,
+                current_app.config["GROQ_MODEL"],
+                yanit.text[:500],
+            )
             raise AIServiceError(
                 f"Yapay zekâ servisi hata döndürdü (HTTP {yanit.status_code})."
             ) from hata

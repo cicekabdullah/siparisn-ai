@@ -31,7 +31,10 @@ class Config:
     # --- Yapay zeka ---
     AI_PROVIDER = os.environ.get("AI_PROVIDER", "groq")
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-    GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
+    # Groq, llama-3.1-8b-instant modelini Enterprise planina aldi; normal
+    # hesaplarda cagrilinca HTTP 404 (model_not_found) doner. Developer
+    # planinda acik olan hizli ve ucuz model gpt-oss-20b.
+    GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
     GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
     # Yapay zekanin uretebilecegi maksimum token ve yaraticilik seviyesi.
