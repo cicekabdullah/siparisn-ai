@@ -1,12 +1,3 @@
-/* =============================================================
-   WIX BACKEND — SiparişN API köprüsü
-   Studio'da yeri: Code sidebar > Backend & Public > siparisn.jsw
-   =============================================================
-   .jsw dosyalarında ihraç edilen her fonksiyon herkese açıktır.
-   Bu yüzden lead listesini çeken uç, Panel sayfasının üye girişi
-   arkasına alınmasıyla korunmalıdır.
-============================================================= */
-
 import { fetch } from 'wix-fetch';
 
 // Render'daki canlı backend adresimiz
@@ -27,10 +18,16 @@ export async function leadKaydet(lead) {
     const yanit = await fetch(API_ADRESI + '/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isim: isim, telefon: telefon, isletme: isletme, mesaj: '' })
+      body: JSON.stringify({
+        isim: isim,
+        telefon: telefon,
+        isletme: isletme,
+        mesaj: ''
+      })
     });
     // Flask hata durumunda da JSON döndürür, gövdeyi her hâlükârda okuruz.
     return await yanit.json();
+
   } catch (hata) {
     console.error('SiparisN API lead hatasi:', hata);
     return { basari: false, hata: 'Kayıt şu an oluşturulamıyor, lütfen tekrar deneyin.' };
@@ -50,8 +47,9 @@ export async function sunucuyuUyandir() {
 }
 
 /* ---------- LEAD LİSTESİ -> GET /api/leads ----------
-   UYARI: Bu liste ad ve telefon içerir, KVKK kapsamında kişisel veridir.
-   Panel sayfası Wix'te üye girişi arkasına alınmalıdır
+   UYARI: .jsw dosyalarında ihraç edilen her fonksiyon herkese açıktır.
+   Bu liste ad ve telefon içerir, yani KVKK kapsamında kişisel veridir.
+   Bu yüzden Panel sayfası Wix'te üye girişi arkasına alınmalıdır
    (Sayfa ayarları > Permissions > Members only). */
 export async function leadleriGetir() {
   try {
@@ -62,7 +60,6 @@ export async function leadleriGetir() {
     return { basari: false, hata: 'Kayıtlara şu an ulaşılamıyor.' };
   }
 }
-
 /* ---------- AI SOHBETİ -> POST /api/sohbet ----------
    Mesajı Flask'taki ai_service.py katmanına iletir, yanıtı döndürür.
    gecmis: asistanın bağlamı hatırlaması için önceki mesajlar. */
