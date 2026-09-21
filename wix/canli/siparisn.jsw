@@ -1,0 +1,85 @@
+/* =============================================================
+   WIX BACKEND — SiparişN API köprüsü
+   Studio'da yeri: Code sidebar > Backend & Public > siparisn.jsw
+   =============================================================
+   .jsw dosyalarında ihraç edilen her fonksiyon herkese açıktır.
+   Bu yüzden lead listesini çeken uç, Panel sayfasının üye girişi
+   arkasına alınmasıyla korunmalıdır.
+============================================================= */
+
+import { fetch } from 'wix-fetch';
+
+// Render'daki canlı backend adresimiz
+const API_ADRESI = 'https://siparisn-ai.onrender.com';
+
+/* ---------- LEAD KAYDI -> POST /api/leads ---------- */
+export async function leadKaydet(lead) {
+  const isim = (lead && lead.isim ? lead.isim : '').trim();
+  const telefon = (lead && lead.telefon ? lead.telefon : '').trim();
+  const isletme = (lead && lead.isletme ? lead.isletme : '').trim();
+
+  // Backend tarafında da doğrula: sayfa kodu atlatılabilir.
+  if (!isim || !telefon) {
+    return { basari: false, hata: 'Ad ve telefon alanları zorunludur.' };
+  }
+
+  try {
+    const yanit = await fetch(API_ADRESI + '/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isim: isim, telefon: telefon, isletme: isletme, mesaj: '' })
+    });
+    // Flask hata durumunda da JSON döndürür, gövdeyi her hâlükârda okuruz.
+    return await yanit.json();
+  } catch (hata) {
+    console.error('SiparisN API lead hatasi:', hata);
+    return { basari: false, hata: 'Kayıt şu an oluşturulamıyor, lütfen tekrar deneyin.' };
+  }
+}
+
+/* ---------- CANLILIK KONTROLÜ -> GET /health ----------
+   Render ücretsiz planda uyur; ilk istek 50 sn sürebilir.
+   Sayfa açılır açılmaz sunucuyu uyandırmak için. */
+export async function sunucuyuUyandir() {
+  try {
+    const yanit = await fetch(API_ADRESI + '/health', { method: 'GET' });
+    return await yanit.json();
+  } catch (hata) {
+    return { basari: false, hata: 'Sunucu yanıt vermiyor.' };
+  }
+}
+
+/* ---------- LEAD LİSTESİ -> GET /api/leads ----------
+   UYARI: Bu liste ad ve telefon içerir, KVKK kapsamında kişisel veridir.
+   Panel sayfası Wix'te üye girişi arkasına alınmalıdır
+   (Sayfa ayarları > Permissions > Members only). */
+export async function leadleriGetir() {
+  try {
+    const yanit = await fetch(API_ADRESI + '/api/leads', { method: 'GET' });
+    return await yanit.json();   // { basari, adet, leadler: [...] }
+  } catch (hata) {
+    console.error('SiparisN API liste hatasi:', hata);
+    return { basari: false, hata: 'Kayıtlara şu an ulaşılamıyor.' };
+  }
+}
+
+/* ---------- AI SOHBETİ -> POST /api/sohbet ----------
+   Mesajı Flask'taki ai_service.py katmanına iletir, yanıtı döndürür.
+   gecmis: asistanın bağlamı hatırlaması için önceki mesajlar. */
+export async function sohbetGonder(mesaj, gecmis) {
+  if (!mesaj || !mesaj.trim()) {
+    return { basari: false, hata: 'Mesaj alanı boş olamaz.' };
+  }
+
+  try {
+    const yanit = await fetch(API_ADRESI + '/api/sohbet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mesaj: mesaj.trim(), gecmis: gecmis || [] })
+    });
+    return await yanit.json();   // { basari, cevap } veya { basari:false, hata }
+  } catch (hata) {
+    console.error('SiparisN API sohbet hatasi:', hata);
+    return { basari: false, hata: 'Asistana şu an ulaşılamıyor, lütfen tekrar deneyin.' };
+  }
+}
