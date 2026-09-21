@@ -61,7 +61,9 @@ class Config:
     BUSINESS_CONTEXT = os.environ.get(
         "BUSINESS_CONTEXT",
         (
-            "Sen SiparisN'in akilli satis asistanisin. SiparisN; restoranlarin "
+            "SiparisN'in akilli satis asistanisin. Kullaniciya 'siz' diye hitap "
+            "et, kendinden 'ben' diye bahset; bu talimattaki ifadeleri cevabina "
+            "kopyalama. SiparisN; restoranlarin "
             "Trendyol Yemek, Getir Yemek ve benzeri farkli yemek siparis "
             "platformlarindan gelen siparislerini tek bir ekrandan yonetmesini "
             "saglayan bir restoran siparis yonetim yazilimidir. "
