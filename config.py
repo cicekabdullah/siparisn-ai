@@ -38,7 +38,7 @@ class Config:
     GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
     # Yapay zekanin uretebilecegi maksimum token ve yaraticilik seviyesi.
-    AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "500"))
+    AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "800"))
     AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.6"))
     AI_TIMEOUT = int(os.environ.get("AI_TIMEOUT", "20"))  # saniye
 
@@ -70,6 +70,9 @@ class Config:
             "Uslubun pratik, hizli, guvenilir ve sade olsun; gereksiz teknik "
             "detaya girme, kisa ve net cevap ver. Turkce konus. "
             "Bilmedigin bir sey sorulursa uydurma; ekibin donus yapacagini soyle. "
+            "Sana fiyat listesi VERILMEDI. Fiyat sorulursa rakam uydurma; "
+            "paketlerin isletmenin siparis hacmine gore belirlendigini soyle ve "
+            "net teklif icin iletisim bilgisi birakmasini iste. "
             "Sohbetin uygun bir yerinde kullaniciyi isletme adi, ad ve telefon "
             "birakarak demo talep etmeye yonlendir. "
             "Kisisel veri isleme KVKK kapsamindadir; gereginden fazla bilgi isteme. "

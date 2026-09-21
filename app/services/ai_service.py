@@ -100,12 +100,23 @@ class AIService:
             "Authorization": f"Bearer {current_app.config['GROQ_API_KEY']}",
             "Content-Type": "application/json",
         }
+        model = current_app.config["GROQ_MODEL"]
         govde = {
-            "model": current_app.config["GROQ_MODEL"],
+            "model": model,
             "messages": mesajlar,
             "max_tokens": current_app.config["AI_MAX_TOKENS"],
             "temperature": current_app.config["AI_TEMPERATURE"],
         }
+
+        # gpt-oss bir "reasoning" modelidir: dusunme adimlarini da token
+        # olarak uretir ve bunlar max_tokens butcesinden yer kaplar. Butce
+        # dusunmeye giderse cevap yarida kesilir. Bu yuzden dusunme cabasini
+        # dusuk tutuyor, dusunme metnini de yanittan gizliyoruz.
+        # Parametreler modele ozgudur; baska bir modele gecilirse 400 hatasi
+        # vermesin diye sadece gpt-oss icin gonderiliyor.
+        if model.startswith("openai/gpt-oss"):
+            govde["reasoning_effort"] = "low"
+            govde["reasoning_format"] = "hidden"
 
         try:
             yanit = requests.post(
