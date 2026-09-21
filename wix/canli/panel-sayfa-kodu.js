@@ -1,25 +1,24 @@
 import { leadleriGetir } from 'backend/siparisn.jsw';
 
-/* SiparişN — Yönetim Paneli
-   Bileşenler: #tekrarlayici (Repeater) + satır içinde
-   #metinIsim #metinTelefon #metinIsletme #metinTarih
-   Ayrıca: #butonYenile #metinOzet
+/* SiparişN — Yönetici Paneli
+   Bileşenler: #tabloKayitlar (Table), #butonYenile (Button), #metinOzet (Text)
 
-   F-Pattern: en önemli kolon (isim) en üstte/solda. */
+   Kayıtlar artık gerçek bir tablo bileşeninde gösteriliyor: her kayıt bir
+   satır, her bilgi ayrı bir hücre. Sütunlar koddan tanımlanıyor ki başlık
+   adı ile Flask API'sinin döndürdüğü alan adı (dataPath) tek yerde eşleşsin.
+
+   F-Pattern: en önemli kolon (ad soyad) en solda. */
+
+const SUTUNLAR = [
+  { id: 'isim',    dataPath: 'isim',    label: 'Ad Soyad',     type: 'string', width: 230 },
+  { id: 'telefon', dataPath: 'telefon', label: 'Numara',       type: 'string', width: 180 },
+  { id: 'isletme', dataPath: 'isletme', label: 'İşletme Adı',  type: 'string', width: 230 },
+  { id: 'tarih',   dataPath: 'tarih',   label: 'Kayıt Tarihi', type: 'string', width: 160 }
+];
 
 $w.onReady(function () {
   $w('#butonYenile').label = 'Yenile';
-  $w('#metinOzet').text = 'Yükleniyor...';
-
-  // Repeater satırlarını doldurma kuralı.
-  // Satır içinde $w DEĞİL $item kullanılır; $w kullanılırsa
-  // bütün satırlar aynı veriyle dolar (klasik Velo hatası).
-  $w('#tekrarlayici').onItemReady(function ($item, veri) {
-    $item('#metinIsim').text = veri.isim;
-    $item('#metinTelefon').text = veri.telefon;
-    $item('#metinIsletme').text = veri.isletme || '—';
-    $item('#metinTarih').text = tarihBicimle(veri.tarih);
-  });
+  $w('#tabloKayitlar').columns = SUTUNLAR;
 
   $w('#butonYenile').onClick(listeyiYukle);
   listeyiYukle();
@@ -32,19 +31,33 @@ async function listeyiYukle() {
     const veri = await leadleriGetir();
 
     if (veri.basari) {
-      // Backend kayıtları zaten en yeniden eskiye sıralıyor.
-      // Her nesnede _id alanı zorunlu ve METİN olmalı — backend döndürüyor.
-      $w('#tekrarlayici').data = veri.leadler;
-      $w('#metinOzet').text = 'Toplam ' + veri.adet + ' kayıt';
+      // Backend kayıtları en yeniden eskiye sıralı döndürüyor.
+      $w('#tabloKayitlar').rows = veri.leadler.map(satirHazirla);
+      $w('#metinOzet').text = veri.adet > 0
+        ? 'Toplam ' + veri.adet + ' kayıt'
+        : 'Henüz kayıt yok.';
     } else {
-      $w('#tekrarlayici').data = [];
+      $w('#tabloKayitlar').rows = [];
       $w('#metinOzet').text = veri.hata || 'Kayıtlar getirilemedi.';
     }
   } catch (hata) {
     console.error('Liste hatasi:', hata);
-    $w('#tekrarlayici').data = [];
+    $w('#tabloKayitlar').rows = [];
     $w('#metinOzet').text = 'Sunucuya ulaşılamadı.';
   }
+}
+
+/* API'den gelen kaydı tablonun beklediği satır nesnesine çevirir.
+   _id alanı zorunlu ve METİN olmalı; backend zaten metin olarak gönderiyor.
+   Boş kalan hücreye tire koyuyoruz ki tablo delik görünmesin. */
+function satirHazirla(lead) {
+  return {
+    _id: String(lead._id),
+    isim: lead.isim || '—',
+    telefon: lead.telefon || '—',
+    isletme: lead.isletme || '—',
+    tarih: tarihBicimle(lead.tarih)
+  };
 }
 
 // '2026-09-21 10:02:39.110' -> '21.09.2026 10:02'
