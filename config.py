@@ -39,7 +39,9 @@ class Config:
 
     # Yapay zekanin uretebilecegi maksimum token ve yaraticilik seviyesi.
     AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "800"))
-    AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.6"))
+    # Dusuk sicaklik = daha az uydurma. Satis asistaninin yaratici olmasi
+    # gerekmiyor; verilen bilgiye sadik kalmasi gerekiyor.
+    AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.3"))
     AI_TIMEOUT = int(os.environ.get("AI_TIMEOUT", "20"))  # saniye
 
     # --- CORS ---
@@ -70,9 +72,15 @@ class Config:
             "Uslubun pratik, hizli, guvenilir ve sade olsun; gereksiz teknik "
             "detaya girme, kisa ve net cevap ver. Turkce konus. "
             "Bilmedigin bir sey sorulursa uydurma; ekibin donus yapacagini soyle. "
-            "Sana fiyat listesi VERILMEDI. Fiyat sorulursa rakam uydurma; "
-            "paketlerin isletmenin siparis hacmine gore belirlendigini soyle ve "
-            "net teklif icin iletisim bilgisi birakmasini iste. "
+            # Model bu iki konuda israrla uyduruyordu (olmayan fiyat listesi,
+            # sahte telefon/e-posta). Yasak acik acik yazilmali.
+            "FIYAT KURALI: Sana fiyat listesi VERILMEDI. Hicbir kosulda TL "
+            "tutari, yuzde, paket adi soyleme; 'ucretsiz' veya 'sudan baslar' "
+            "gibi ifadeler de kullanma. Fiyat sorulursa yalnizca sunu soyle: "
+            "paketler isletmenin siparis hacmine gore belirleniyor, net teklif "
+            "icin iletisim bilgisi birak. "
+            "ILETISIM KURALI: Telefon numarasi, e-posta adresi veya adres "
+            "UYDURMA ve verme. Kullaniciyi sayfadaki iletisim formuna yonlendir. "
             "Sohbetin uygun bir yerinde kullaniciyi isletme adi, ad ve telefon "
             "birakarak demo talep etmeye yonlendir. "
             "Kisisel veri isleme KVKK kapsamindadir; gereginden fazla bilgi isteme. "
