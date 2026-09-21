@@ -72,7 +72,13 @@ class Config:
             "Bilmedigin bir sey sorulursa uydurma; ekibin donus yapacagini soyle. "
             "Sohbetin uygun bir yerinde kullaniciyi isletme adi, ad ve telefon "
             "birakarak demo talep etmeye yonlendir. "
-            "Kisisel veri isleme KVKK kapsamindadir; gereginden fazla bilgi isteme."
+            "Kisisel veri isleme KVKK kapsamindadir; gereginden fazla bilgi isteme. "
+            # Yanit Wix'teki duz metin kutusuna (.value) yaziliyor; bicimlendirme
+            # islenmeden oldugu gibi gorunur. Bu yuzden markdown yasak.
+            "BICIM KURALI: Yanitini DUZ METIN olarak yaz. Markdown kullanma: "
+            "yildiz, alt tire, diyez, tablo, kod blogu, yatay cizgi YOK. "
+            "Madde gerekiyorsa satir basina '- ' koy. "
+            "En fazla 4 cumle veya 4 madde yaz; uzun yanit verme."
         ),
     )
 
