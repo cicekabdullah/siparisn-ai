@@ -7,7 +7,7 @@ Kaynağın tek doğru hâli Wix'tir; burası kayıt ve sözlü savunma içindir.
 |---|---|
 | `siparisn.jsw` | Code sidebar → Backend & Public → Backend |
 | `masterPage.js` | Code sidebar → Page Code → masterPage (her sayfada çalışır) |
-| `ana-sayfa-kodu.js` | Home sayfası → Page Code |
+| `sohbet-ortak-kod.js` | **Üç sayfada da aynı dosya**: ana sayfa, hakkımızda, Merak Edilenler → Page Code |
 | `panel-sayfa-kodu.js` | Panel sayfası → Page Code |
 
 ## Canlı adresler
@@ -43,31 +43,39 @@ SiparişN'e ait içerik taşımıyordu.
 | `text221` | Text | "SiparişN" kelime markası |
 | `menu1` | Menu | Site menüsü (sayfalarla eşleşir) |
 
-**Home sayfası (10 bileşen)**
+**Sohbet bileşenleri — üç sayfada da AYNI ID'ler**
 
-Sohbet kartı yapısı: `section19 > box201` içinde `#button21` (kartın dışında)
-ve `#box291` (kart) yan yana durur; kart açılınca düğme gizlenir.
+Wix bileşen ID'lerini sayfa başına üretir. Aynı kodun üç sayfada da
+çalışabilmesi için ID'ler elle eşitlendi (ana sayfadaki sohbet kartı
+`box291` iken `box297` olarak yeniden adlandırıldı).
 
 | ID | Tür | Görev |
 |---|---|---|
-| `button21` | Button | "Asistana sor" — sohbeti açar (kartın DIŞINDA) |
-| `box291` | Container | Sohbet kartı |
+| `button21` | Button | "Asistana sor" — sohbeti açar (kartın DIŞINDA, sabitlenmiş) |
+| `box297` | Container | Sohbet kartı (sabitlenmiş) |
 | `textBox1` | Text Box | AI cevapları — yazışma dökümü, readOnly |
 | `textBox2` | Text Box | Kullanıcının sorusu |
-| `button20` | Button | "Gönder" — soruyu yollar |
-| `button22` | Button | "Kapat" — sohbeti kapatır |
+| `button20` | Button | "Gönder" |
+| `button22` | Button | "Kapat" |
+
+**İletişim formu — YALNIZCA ana sayfada**
+
+| ID | Tür | Görev |
+|---|---|---|
 | `girisIsim` | Text Input | Ad Soyad |
 | `girisTelefon` | Text Input | Telefon |
 | `butonKaydet` | Button | Gönder — zemin `#C2410C` |
 | `metinDurum` | Text | Form geri bildirimi |
 
+Diğer iki sayfada bu öğeler yok. Wix'te olmayan bir öğeye **metot**
+çağırmak (`$w('#butonKaydet').onClick(...)`) `TypeError` fırlatır ve
+sayfanın tamamını kırar; **özellik ataması** (`.text = ''`) ise güvenlidir.
+Bu yüzden kod, onClick bağlamadan önce öğenin varlığını doğrular.
+
 `textBox1` bir Text öğesi değil, çok satırlı **giriş kutusu**. Giriş kutuları
 yalnızca düz metin taşıdığı için (`.value`, `.html` yok) yazışma renkli
 baloncuk yerine `Siz:` / `SiparişN:` satırları hâlinde yazılıyor.
 Kutu kendi kendine en alta kaymadığından ekranda son 4 mesaj tutuluyor.
-
-İletişim formundaki "İşletmeniz" alanı sayfadan kaldırıldı; bu yüzden
-yönetici panelindeki **İşletme Adı** sütunu boş gelir.
 
 **Panel sayfası (5 bileşen)**
 

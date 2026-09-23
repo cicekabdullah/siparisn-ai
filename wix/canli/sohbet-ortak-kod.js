@@ -1,24 +1,25 @@
 import { leadKaydet, sohbetGonder, sunucuyuUyandir } from 'backend/siparisn.jsw';
 
 /* =========================================================
-   SiparişN — Ana Sayfa
+   SiparişN — ORTAK SOHBET KODU
+   Bu dosyanın aynısı üç sayfada da duruyor:
+   ana sayfa, hakkımızda, Merak Edilenler.
 
-   Chatbot (section19 > box201)
+   Çalışabilmesi için üç sayfadaki bileşen ID'leri aynı yapıldı:
      #button21  kartın DIŞINDA — sohbeti açar
-     #box291    sohbet kartı, içinde:
-       #textBox1  AI cevapları (yazışma dökümü)
+     #box297    sohbet kartı, içinde:
+       #textBox1  AI cevapları (yazışma dökümü, readOnly)
        #textBox2  kullanıcının sorusu
        #button20  soruyu gönderir
        #button22  sohbeti kapatır
 
-   İletişim formu : #girisIsim #girisTelefon #butonKaydet #metinDurum
-   Backend        : backend/siparisn.jsw -> https://siparisn-ai.onrender.com
+   İletişim formu (#girisIsim #girisTelefon #butonKaydet #metinDurum)
+   YALNIZCA ana sayfada var. Diğer iki sayfada Wix bu öğeleri bulamaz,
+   konsola uyarı yazar ve geçer — sayfa kırılmaz. Önemli olan
+   formuGonder fonksiyonunun TANIMLI olması; tanımsız olsaydı
+   ReferenceError verir ve sayfanın tamamı bozulurdu.
 
-   NOT — yazışma neden baloncuklu değil:
-   #textBox1 bir Text öğesi değil, çok satırlı GİRİŞ KUTUSU (Text Box).
-   Giriş kutuları yalnızca düz metin taşır (.value); .html kabul etmediği
-   için renkli baloncuk çizilemiyor. Bu yüzden yazışma 'Siz:' / 'SiparişN:'
-   satırları hâlinde yazılıyor ve kullanıcı içine yazamasın diye readOnly.
+   Backend: backend/siparisn.jsw -> https://siparisn-ai.onrender.com
    ========================================================= */
 
 const KARSILAMA = 'Merhaba. SiparişN\'in merkezi sipariş yönetimi, platform ' +
@@ -42,28 +43,26 @@ $w.onReady(function () {
   $w('#textBox1').readOnly = true;
   $w('#textBox2').placeholder = 'Sorunuzu buraya sorun';
 
-  $w('#metinDurum').text = '';
-
   // --- Başlangıç: sohbet kapalı, sadece açma düğmesi görünür ---
   yazisma = [{ kim: 'bot', metin: KARSILAMA }];
   ekranaBas();
   sekmeyiKapat();
 
-  // --- Olaylar ---
+  // --- Sohbet olayları ---
   $w('#button21').onClick(sekmeyiAc);
   $w('#button22').onClick(sekmeyiKapat);
   $w('#button20').onClick(soruSor);
 
-  /* Enter gönderir, Shift+Enter alt satıra geçer.
-     Çok satırlı kutuda Enter normalde satır atlar; sohbet alışkanlığına uyduruyoruz. */
-  $w('#textBox2').onKeyPress(function (olay) {
-    if (olay.key === 'Enter' && !olay.shiftKey) soruSor();
-  });
-
-  $w('#butonKaydet').onClick(formuGonder);
-  $w('#girisTelefon').onKeyPress(function (olay) {
-    if (olay.key === 'Enter') formuGonder();
-  });
+  /* --- İletişim formu: YALNIZCA ana sayfada var ---
+     Diğer iki sayfada #butonKaydet bulunmadığı için Wix boş bir seçici
+     döndürüyor ve onun üzerinde onClick çağırmak TypeError veriyor.
+     Bu yüzden önce öğenin gerçekten var olduğunu doğruluyoruz.
+     (Özellik ataması -.text- güvenli, hata vermez; asıl sorun metot çağrısı.) */
+  $w('#metinDurum').text = '';
+  const butonKaydet = $w('#butonKaydet');
+  if (typeof butonKaydet.onClick === 'function') {
+    butonKaydet.onClick(formuGonder);
+  }
 
   // Render ücretsiz planda uyur; ilk istek 50 sn sürebilir.
   sunucuyuUyandir().catch(function () {});
@@ -74,13 +73,13 @@ $w.onReady(function () {
    biri görünürken diğeri gizli oluyor. collapse() öğeyi yerinden de
    kaldırır, hide() ise boş yer bırakırdı. */
 function sekmeyiAc() {
-  $w('#box291').expand();
+  $w('#box297').expand();
   $w('#button21').collapse();
   $w('#textBox2').focus();
 }
 
 function sekmeyiKapat() {
-  $w('#box291').collapse();
+  $w('#box297').collapse();
   $w('#button21').expand();
 }
 
@@ -137,8 +136,8 @@ async function soruSor() {
 }
 
 /* ---------- 2) LEAD KAYDI ----------
-   İşletme alanı sayfadan kaldırıldı; backend ve Flask bu alanı
-   isteğe bağlı kabul ettiği için boş gönderiyoruz. */
+   Yalnızca ana sayfada çalışır; diğer sayfalarda #butonKaydet olmadığı
+   için hiç tetiklenmez. Yine de TANIMLI olmak zorunda. */
 async function formuGonder() {
   const isim = $w('#girisIsim').value.trim();
   const telefon = $w('#girisTelefon').value.trim();
