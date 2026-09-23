@@ -10,22 +10,30 @@ $w.onReady(function () {
   $w('#button11').link = '/panel';
   $w('#button11').target = '_self';
 
-  // Logoya tıklayınca Ana Sayfa'ya dön.
-  // Panelden çıkmak için ayrı bir 'geri' düğmesine gerek kalmaz.
+  /* Header'daki logoya tıklayınca Ana Sayfa'ya dön.
+     Logo iki parçadan oluşuyor; ikisi de tıklanabilir olsun:
+       #box290         "SiparişN" kelime markası
+       #vectorImage39  logo işareti (turuncu/sarı simge)
+     İkisi de Header'ın içinde, yani masterPage'e ait — bu yüzden
+     bağlantıları sayfa kodlarında değil burada tanımlıyoruz.
+
+     NOT: #vectorImage38 bilerek listede YOK. O, sohbet kartının
+     içindeki küçük logo; ona tıklayınca sayfadan çıkmak istemiyoruz. */
   anaSayfayaBagla('#box290');
-  anaSayfayaBagla('#vectorImage38');
+  anaSayfayaBagla('#vectorImage39');
 });
 
 /* Verilen öğeyi Ana Sayfa'ya bağlar.
-   Öğe o sayfada yoksa sessizce geçer — kod hata vermesin. */
+   Wix'te olmayan bir öğe üzerinde onClick çağırmak TypeError fırlatır
+   ve o sayfanın kodunu tamamen durdurur. Bu yüzden bağlamadan önce
+   öğenin gerçekten var olduğunu doğruluyoruz. */
 function anaSayfayaBagla(secici) {
-  try {
-    const oge = $w(secici);
-    if (!oge) return;
-    oge.onClick(function () {
-      wixLocation.to('/');
-    });
-  } catch (hata) {
-    console.log('Logo baglanamadi:', secici);
+  const oge = $w(secici);
+  if (!oge || typeof oge.onClick !== 'function') {
+    console.log('Ana sayfa baglantisi kurulamadi, oge yok:', secici);
+    return;
   }
+  oge.onClick(function () {
+    wixLocation.to('/');
+  });
 }
